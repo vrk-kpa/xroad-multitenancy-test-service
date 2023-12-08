@@ -1,11 +1,10 @@
-package fi.dvv.xroad.resttestservice;
+package fi.dvv.xroad.multitenancytestservice;
 
-import fi.dvv.xroad.resttestservice.model.ErrorDto;
-import fi.dvv.xroad.resttestservice.model.GreetingDto;
-import fi.dvv.xroad.resttestservice.model.RandomNumberDto;
-import fi.dvv.xroad.resttestservice.service.JwtService;
+import fi.dvv.xroad.multitenancytestservice.model.ErrorDto;
+import fi.dvv.xroad.multitenancytestservice.model.GreetingDto;
+import fi.dvv.xroad.multitenancytestservice.model.RandomNumberDto;
+import fi.dvv.xroad.multitenancytestservice.service.JwtService;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,9 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 
-import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;

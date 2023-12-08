@@ -1,19 +1,17 @@
-package fi.dvv.xroad.resttestservice.contoller;
+package fi.dvv.xroad.multitenancytestservice.contoller;
 
 import com.nimbusds.jose.JOSEException;
-import fi.dvv.xroad.resttestservice.error.UnauthorizedException;
-import fi.dvv.xroad.resttestservice.error.ValidationException;
-import fi.dvv.xroad.resttestservice.model.GreetingDto;
-import fi.dvv.xroad.resttestservice.model.RandomNumberDto;
-import fi.dvv.xroad.resttestservice.service.JwtService;
-import org.owasp.esapi.ESAPI;
+import fi.dvv.xroad.multitenancytestservice.error.UnauthorizedException;
+import fi.dvv.xroad.multitenancytestservice.error.ValidationException;
+import fi.dvv.xroad.multitenancytestservice.model.GreetingDto;
+import fi.dvv.xroad.multitenancytestservice.model.RandomNumberDto;
+import fi.dvv.xroad.multitenancytestservice.service.JwtService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;

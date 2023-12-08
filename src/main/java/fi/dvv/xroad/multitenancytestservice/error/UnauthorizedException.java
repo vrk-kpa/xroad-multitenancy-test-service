@@ -1,4 +1,4 @@
-package fi.dvv.xroad.resttestservice.error;
+package fi.dvv.xroad.multitenancytestservice.error;
 
 import java.nio.file.AccessDeniedException;
 

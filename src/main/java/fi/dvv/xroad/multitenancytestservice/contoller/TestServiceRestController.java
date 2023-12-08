@@ -1,13 +1,9 @@
-package fi.dvv.xroad.resttestservice.contoller;
+package fi.dvv.xroad.multitenancytestservice.contoller;
 
-import fi.dvv.xroad.resttestservice.error.ValidationException;
-import fi.dvv.xroad.resttestservice.model.ErrorDto;
-import fi.dvv.xroad.resttestservice.model.GreetingDto;
-import fi.dvv.xroad.resttestservice.model.RandomNumberDto;
+import fi.dvv.xroad.multitenancytestservice.error.ValidationException;
+import fi.dvv.xroad.multitenancytestservice.model.GreetingDto;
+import fi.dvv.xroad.multitenancytestservice.model.RandomNumberDto;
 import org.owasp.esapi.ESAPI;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;

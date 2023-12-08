@@ -1,4 +1,4 @@
-package fi.dvv.xroad.resttestservice.auth;
+package fi.dvv.xroad.multitenancytestservice.auth;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

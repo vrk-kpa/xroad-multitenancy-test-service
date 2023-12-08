@@ -1,7 +1,7 @@
-package fi.dvv.xroad.resttestservice.auth;
+package fi.dvv.xroad.multitenancytestservice.auth;
 
 import com.nimbusds.jose.JOSEException;
-import fi.dvv.xroad.resttestservice.service.JwtService;
+import fi.dvv.xroad.multitenancytestservice.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

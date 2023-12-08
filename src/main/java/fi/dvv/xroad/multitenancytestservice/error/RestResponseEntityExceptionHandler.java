@@ -1,6 +1,6 @@
-package fi.dvv.xroad.resttestservice.error;
+package fi.dvv.xroad.multitenancytestservice.error;
 
-import fi.dvv.xroad.resttestservice.model.ErrorDto;
+import fi.dvv.xroad.multitenancytestservice.model.ErrorDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

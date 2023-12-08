@@ -1,8 +1,8 @@
-package fi.dvv.xroad.resttestservice;
+package fi.dvv.xroad.multitenancytestservice;
 
-import fi.dvv.xroad.resttestservice.model.ErrorDto;
-import fi.dvv.xroad.resttestservice.model.GreetingDto;
-import fi.dvv.xroad.resttestservice.model.RandomNumberDto;
+import fi.dvv.xroad.multitenancytestservice.model.ErrorDto;
+import fi.dvv.xroad.multitenancytestservice.model.GreetingDto;
+import fi.dvv.xroad.multitenancytestservice.model.RandomNumberDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

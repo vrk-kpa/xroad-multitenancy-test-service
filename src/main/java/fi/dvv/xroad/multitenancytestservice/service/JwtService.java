@@ -1,4 +1,4 @@
-package fi.dvv.xroad.resttestservice.service;
+package fi.dvv.xroad.multitenancytestservice.service;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;

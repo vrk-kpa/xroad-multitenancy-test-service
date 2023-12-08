@@ -1,4 +1,4 @@
-package fi.dvv.xroad.resttestservice.auth;
+package fi.dvv.xroad.multitenancytestservice.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

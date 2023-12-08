@@ -1,6 +1,6 @@
-package fi.dvv.xroad.resttestservice;
+package fi.dvv.xroad.multitenancytestservice;
 
-import fi.dvv.xroad.resttestservice.service.JwtService;
+import fi.dvv.xroad.multitenancytestservice.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

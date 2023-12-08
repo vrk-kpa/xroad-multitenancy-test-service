@@ -11,10 +11,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>fi.dvv.xroad</groupId>
-	<artifactId>rest-test-service</artifactId>
+	<artifactId>multitenancy-test-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>xroad-rest-test-service</name>
-	<description>xroad-rest-test-service</description>
+	<name>xroad-multitenancy-test-service</name>
+	<description>xroad-multitenancy-test-service</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -76,5 +76,4 @@
 			<url>https://vrk-artifactory-01.eden.csc.fi:443/maven-local</url>
 		</snapshotRepository>
 	</distributionManagement>
-
 </project>

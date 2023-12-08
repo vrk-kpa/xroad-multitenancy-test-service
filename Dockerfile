@@ -1,7 +1,7 @@
 FROM amazoncorretto:17-alpine
 
 # Add the test service jar to container
-ADD target/rest-test-service-*.jar test-service.jar
+ADD target/multitenancy-test-service-*.jar test-service.jar
 
 # Entry with exec
 ENTRYPOINT exec java $JAVA_OPTS -jar /test-service.jar

@@ -31,7 +31,7 @@ public class JwtService {
         char[] password = "changeit".toCharArray();
 
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
-        File file = new File("src/main/resources/keys.p12");
+        File file = new File("keys/keys.p12");
         keyStore.load(new FileInputStream(file), password);
         key = RSAKey.load(keyStore, "xroad-multi-tenancy-test", password);
     }

@@ -17,7 +17,6 @@ docker-compose build
 docker-compose up
 ```
 
-
 It takes a while for the security server to start up. You can check the logs with `docker compose logs -f ss`.
 
 Login to the security server UI by opening http://localhost:4000 in your browser. 
@@ -36,3 +35,23 @@ to make calls to the service code `rest-test`.
 For detailed example of standalone security server configuration, refer to 
 [the tutorial](https://github.com/digitaliceland/Straumurinn/blob/master/DOC/Manuals/standalone_security_server_tutorial.md).
 
+To call the service with curl, first send a login command:
+```shell
+curl -v \
+  -X GET \
+  -H 'X-Road-Client: CS/ORG/1111/TestClient' \
+  -H "X-Road-Represented-Party: Foo/BAR" \
+  -H "Member-Username: Foo/BAR" \
+  -H "Member-Password: password" \
+  -i 'http://localhost:8080/r1/CS/ORG/1111/TestService/multitenancy-test/login'
+```
+
+In the response headers you get the JWT token that can be used to authenticate when calling the private endpoints:
+```shell
+curl -v \
+  -X GET \
+  -H 'X-Road-Client: CS/ORG/1111/TestClient' \
+  -H "Authorization: Bearer <your-token-here>" \
+  -i 'http://localhost:8080/r1/CS/ORG/1111/TestService/multitenancy-test/private/greeting'
+  
+```

@@ -1,7 +1,7 @@
 package fi.dvv.xroad.multitenancytestservice;
 
 import fi.dvv.xroad.multitenancytestservice.model.ErrorDto;
-import fi.dvv.xroad.multitenancytestservice.model.GreetingDto;
+import fi.dvv.xroad.multitenancytestservice.model.MessageDto;
 import fi.dvv.xroad.multitenancytestservice.model.RandomNumberDto;
 import fi.dvv.xroad.multitenancytestservice.service.JwtService;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ class MultitenancyApiTest {
 
     @Test
     void getGreetingWithoutJwtReturnsUnauthorized() throws Exception {
-        String randomUrl = "http://localhost:" + port + contextPath + "/private/greeting";
+        String randomUrl = "http://localhost:" + port + contextPath + "/private/message";
         ErrorDto error = restTemplate.getForObject(randomUrl, ErrorDto.class);
         assertThat(error.httpStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
@@ -110,15 +110,15 @@ class MultitenancyApiTest {
     }
 
     @Test
-    void getGreetingWithJwtReturnsGreetingWithSubject() throws Exception {
+    void getHelloWithJwtReturnsGreetingWithSubject() throws Exception {
         String jwt = jwtService.generateJwt("FOO/12345-6", Date.from(Instant.now().plusSeconds(60*60*2 /* == 2 hours */)));
 
-        String greetingUrl = "http://localhost:" + port + contextPath + "/private/greeting";
-        HttpHeaders greetingHeaders = new HttpHeaders();
-        greetingHeaders.set("Authorization", "Bearer " + jwt);
-        HttpEntity greetingEntity = new HttpEntity(greetingHeaders);
-        GreetingDto greetingResponse = restTemplate.exchange(greetingUrl, HttpMethod.GET, greetingEntity, GreetingDto.class).getBody();
-        assertThat(greetingResponse.greeting()).contains("FOO/12345-6");
+        String helloUrl = "http://localhost:" + port + contextPath + "/private/hello";
+        HttpHeaders helloHeaders = new HttpHeaders();
+        helloHeaders.set("Authorization", "Bearer " + jwt);
+        HttpEntity helloEntity = new HttpEntity(helloHeaders);
+        MessageDto helloResponse = restTemplate.exchange(helloUrl, HttpMethod.GET, helloEntity, MessageDto.class).getBody();
+        assertThat(helloResponse.message()).contains("FOO/12345-6");
     }
 
     @Test

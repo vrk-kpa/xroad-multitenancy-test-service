@@ -3,7 +3,7 @@ package fi.dvv.xroad.multitenancytestservice.contoller;
 import com.nimbusds.jose.JOSEException;
 import fi.dvv.xroad.multitenancytestservice.error.UnauthorizedException;
 import fi.dvv.xroad.multitenancytestservice.error.ValidationException;
-import fi.dvv.xroad.multitenancytestservice.model.GreetingDto;
+import fi.dvv.xroad.multitenancytestservice.model.MessageDto;
 import fi.dvv.xroad.multitenancytestservice.model.RandomNumberDto;
 import fi.dvv.xroad.multitenancytestservice.service.JwtService;
 import org.springframework.http.HttpHeaders;
@@ -29,7 +29,7 @@ public class MultitenancyTestServiceRestController {
     }
 
     @GetMapping("/login")
-    public ResponseEntity<GreetingDto> login(
+    public ResponseEntity<MessageDto> login(
             @RequestHeader("X-Road-Represented-Party") String representedParty,
             @RequestHeader("Member-Username") String username,
             @RequestHeader("Member-Password") String password
@@ -54,7 +54,7 @@ public class MultitenancyTestServiceRestController {
         responseHeaders.set("Authorization", "Bearer " + jwt);
         responseHeaders.set("X-Road-Represented-Party", representedParty);
 
-        return new ResponseEntity<>(new GreetingDto("Login success."), responseHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new MessageDto("Login success."), responseHeaders, HttpStatus.OK);
     }
 
     @GetMapping("/jwks")
@@ -65,13 +65,13 @@ public class MultitenancyTestServiceRestController {
 
     @GetMapping("private/random")
     public RandomNumberDto getRandomInt() {
-        System.out.println("called /random");
+        System.out.println("called /private/random");
         return new RandomNumberDto(randomGenerator.nextInt(maxRandom));
     }
 
-    @GetMapping("private/greeting")
-    public GreetingDto getGreeting(@AuthenticationPrincipal String principal) {
-        System.out.println("called /greeting");
-        return new GreetingDto("Hello " + principal + "! Greetings from adapter server!");
+    @GetMapping("private/hello")
+    public MessageDto getGreeting(@AuthenticationPrincipal String principal) {
+        System.out.println("called /private/hello");
+        return new MessageDto("Hello " + principal + "! Greetings from adapter server!");
     }
 }

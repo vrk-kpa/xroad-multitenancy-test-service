@@ -1,7 +1,7 @@
 package fi.dvv.xroad.multitenancytestclient.contoller;
 
 import fi.dvv.xroad.multitenancytestclient.error.ValidationException;
-import fi.dvv.xroad.multitenancytestclient.model.GreetingDto;
+import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
 import org.owasp.esapi.ESAPI;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,8 +21,8 @@ public class TestServiceRestController {
         return new RandomNumberDto(randomGenerator.nextInt(maxRandom));
     }
 
-    @GetMapping("/greeting")
-    public GreetingDto getGreeting(@RequestParam(value = "name", defaultValue = "") String name) {
+    @GetMapping("/hello")
+    public MessageDto getGreeting(@RequestParam(value = "name", defaultValue = "") String name) {
         System.out.println("called /greeting");
 
         String nameOut = "";
@@ -32,7 +32,7 @@ public class TestServiceRestController {
             nameOut = " " + ESAPI.encoder().encodeForJSON(name);
         }
 
-        return new GreetingDto("Hello" + nameOut + "! Greetings from adapter server!");
+        return new MessageDto("Hello" + nameOut + "! Greetings from adapter server!");
     }
 
     private Boolean stringIsEmpty(String s) {

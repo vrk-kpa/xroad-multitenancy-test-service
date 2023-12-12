@@ -30,7 +30,8 @@ class ApiTest {
     private String baseUrl() {
         return "http://localhost:" + port + contextPath;
     };
-    
+
+    /*
     @Test
     void randomReturnsRandomNumber() throws Exception {
         assertThat(this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class).randomNumber()).isGreaterThanOrEqualTo(1).isLessThanOrEqualTo(100);
@@ -63,6 +64,7 @@ class ApiTest {
         assertThat(error.errorMessage()).isEqualTo("Name is too long. Max length is 256 characters.");
         assertThat(error.httpStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
+    */
 
     @Test
     void nonExistentEndpointReturnsError() throws Exception {

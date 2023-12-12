@@ -1,0 +1,20 @@
+server.servlet.contextPath: /rest-api
+springdoc.api-docs.path: /api-docs
+spring.web.resources.add-mappings: false
+
+security-server:
+  url: http://ss:8080
+  client-id: CS/ORG/1111/TestClient
+  service-id: CS/ORG/1111/TestService/rest-test
+
+---
+spring:
+  config:
+    activate:
+      on-profile: FI-TEST
+
+security-server:
+  url: http://fitestsecurityserver:80
+  client-id: FI-TEST/ORG/1111/TestClient
+  service-id: FI-TEST/ORG/1111/TestService/rest-test
+

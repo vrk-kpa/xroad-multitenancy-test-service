@@ -3,36 +3,28 @@ package fi.dvv.xroad.multitenancytestclient.contoller;
 import fi.dvv.xroad.multitenancytestclient.error.ValidationException;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
+import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionService;
 import org.owasp.esapi.ESAPI;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Random;
-
 @RestController
 public class TestServiceRestController {
-    final private Random randomGenerator = new Random();
-    final private int maxRandom = 101;
+    final private XroadConnectionService xroadConnectionService;
+
+    public TestServiceRestController(XroadConnectionService xroadConnectionService) {
+        this.xroadConnectionService = xroadConnectionService;
+    }
 
     @GetMapping("/random")
     public RandomNumberDto getRandomInt() {
-        System.out.println("called /random");
-        return new RandomNumberDto(randomGenerator.nextInt(maxRandom));
+        return xroadConnectionService.getRandom();
     }
 
     @GetMapping("/hello")
     public MessageDto getGreeting(@RequestParam(value = "name", defaultValue = "") String name) {
-        System.out.println("called /greeting");
-
-        String nameOut = "";
-
-        if(!stringIsEmpty(name)) {
-            validateName(name);
-            nameOut = " " + ESAPI.encoder().encodeForJSON(name);
-        }
-
-        return new MessageDto("Hello" + nameOut + "! Greetings from adapter server!");
+        return xroadConnectionService.getHello(name);
     }
 
     private Boolean stringIsEmpty(String s) {

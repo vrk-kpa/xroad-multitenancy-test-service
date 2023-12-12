@@ -8,9 +8,16 @@ services:
 
   test-service:
     build:
-      context: ..
+      context: ../test-service
       dockerfile: ./Dockerfile
     volumes:
-      - ${PWD}/../keys/keys.p12:/app/keys/keys.p12:ro
+      - ${PWD}/../test-service/keys/keys.p12:/app/keys/keys.p12:ro
     ports:
       - 8070:8080
+
+  test-client:
+    build:
+      context: ../test-client
+      dockerfile: ./Dockerfile
+    ports:
+      - 8060:8080

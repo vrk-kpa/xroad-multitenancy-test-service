@@ -55,3 +55,77 @@ curl -v \
   -i 'http://localhost:8080/r1/CS/ORG/1111/TestService/multitenancy-test/private/greeting'
   
 ```
+
+## Generating keys and certificates
+### test-service
+Needs a key-pair to create JWTs.
+
+### test-client
+Needs a certificate for SSL:
+```
+keytool -genkeypair \
+    -alias xroad-multitenancy-test-client \
+    -keyalg RSA \
+    -keysize 4096 \
+    -validity 3650 \
+    -dname "CN=xroad-multitenancy-test-client,OU=suomi-fi-palveluvayla,O=DVV,L=,S=CA,C=U" \
+    -keypass changeit \
+    -keystore test-client/keys/keystore.p12 \
+    -storeType PKCS12 \
+    -storepass changeit
+```
+
+### mocking external consumer organisations
+To mock external consumers, you need to create certificates for them.
+`external-consumer` directory contains a script to generate certificates 
+for two mock organisations, `org1`and `org2`:
+```shell
+cd external-consumer
+./generate-certs.sh
+```
+
+
+## Adding certificates to trust stores
+### test-service
+
+### test-client
+
+```
+keytool \
+    -import \
+    -file external-consumer/org2/certs/cert.pem \
+    -alias org2 \
+    -keystore test-client/keys/truststore.p12 \
+    -storepass changeit \
+    -storeType PKCS12 \
+    -noprompt
+
+keytool \
+    -import \
+    -file external-consumer/org1/certs/cert.pem \
+    -alias org1 \
+    -keystore test-client/keys/truststore.p12 \
+    -storepass changeit \
+    -storeType PKCS12 \
+    -noprompt
+```
+
+
+
+
+
+### mocking external consumer organisations
+Externals consumers need to trust the test-clients certificate.
+To export the test-client certificate from test-client keystore in pem format, run:
+```shell
+cd external-consumer
+./export-test-client-cert.sh
+```
+
+The `test-request.sh` script then uses the exported certificate to trust the test-client 
+when making calls as a mock organisation.
+
+When testing locally you must add the following line to `/etc/hosts` to match the test-clients certificate CN:
+```
+127.0.0.1 xroad-multitenancy-test-client
+```

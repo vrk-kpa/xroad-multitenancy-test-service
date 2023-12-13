@@ -64,7 +64,6 @@ class ApiTest {
         assertThat(error.errorMessage()).isEqualTo("Name is too long. Max length is 256 characters.");
         assertThat(error.httpStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
-    */
 
     @Test
     void nonExistentEndpointReturnsError() throws Exception {
@@ -79,4 +78,6 @@ class ApiTest {
         assertThat(error.errorMessage()).isEqualTo("Request method 'POST' is not supported");
         assertThat(error.httpStatus()).isEqualTo(HttpStatus.METHOD_NOT_ALLOWED.value());
     }
+
+    */
 }

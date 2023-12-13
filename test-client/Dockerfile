@@ -6,4 +6,4 @@ ADD target/multitenancy-test-client-*.jar test-client.jar
 ENTRYPOINT exec java $JAVA_OPTS -jar /app/test-client.jar
 
 # Expose default port
-EXPOSE 8080
+EXPOSE 8443

@@ -2,6 +2,18 @@ server.servlet.contextPath: /rest-api
 springdoc.api-docs.path: /api-docs
 spring.web.resources.add-mappings: false
 
+server:
+  port: 8443
+  ssl:
+    key-store-type: "PKCS12"
+    key-store: "file:test-client/keys/keystore.p12"
+    key-store-password: "changeit"
+    key-alias: "xroad-multitenancy-test-client"
+    key-password: "changeit"
+    client-auth: need
+    trust-store: "file:test-client/keys/truststore.p12"
+    trust-store-password: "changeit"
+
 security-server:
   url: http://ss:8080
   client-id: CS/ORG/1111/TestClient

@@ -19,5 +19,8 @@ services:
     build:
       context: ../test-client
       dockerfile: ./Dockerfile
+    volumes:
+      - ${PWD}/../test-client/keys/keystore.p12:/app/test-client/keys/keystore.p12:ro
+      - ${PWD}/../test-client/keys/truststore.p12:/app/test-client/keys/truststore.p12:ro
     ports:
-      - 8060:8080
+      - 8443:8443

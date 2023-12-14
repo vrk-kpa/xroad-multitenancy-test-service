@@ -89,17 +89,10 @@ cd external-consumer
 ### test-service
 
 ### test-client
+Add the certs of external consumer organisations org1 and org2 to the client's trust store.
+Cert of org3 is not added to allow testing that calls from untrusted consumer will fail.
 
 ```
-keytool \
-    -import \
-    -file external-consumer/org2/certs/cert.pem \
-    -alias org2 \
-    -keystore test-client/keys/truststore.p12 \
-    -storepass changeit \
-    -storeType PKCS12 \
-    -noprompt
-
 keytool \
     -import \
     -file external-consumer/org1/certs/cert.pem \
@@ -108,11 +101,16 @@ keytool \
     -storepass changeit \
     -storeType PKCS12 \
     -noprompt
+
+keytool \
+    -import \
+    -file external-consumer/org2/certs/cert.pem \
+    -alias org2 \
+    -keystore test-client/keys/truststore.p12 \
+    -storepass changeit \
+    -storeType PKCS12 \
+    -noprompt
 ```
-
-
-
-
 
 ### mocking external consumer organisations
 Externals consumers need to trust the test-clients certificate.

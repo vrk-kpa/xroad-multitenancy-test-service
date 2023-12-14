@@ -14,3 +14,4 @@ self_signed_cert () {
 
 self_signed_cert org1
 self_signed_cert org2
+self_signed_cert org3

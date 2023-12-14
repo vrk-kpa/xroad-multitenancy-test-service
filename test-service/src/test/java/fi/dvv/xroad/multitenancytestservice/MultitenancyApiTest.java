@@ -78,7 +78,7 @@ class MultitenancyApiTest {
     }
 
     @Test
-    void getLoginReturensJwt() throws Exception {
+    void getLoginReturnsJwt() throws Exception {
         String loginUrl = baseUrl() + "/login";
 
         HttpHeaders loginHeaders = new HttpHeaders();

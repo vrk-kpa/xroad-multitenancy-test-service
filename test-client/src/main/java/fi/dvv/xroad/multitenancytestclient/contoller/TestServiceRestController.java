@@ -1,12 +1,13 @@
 package fi.dvv.xroad.multitenancytestclient.contoller;
 
-import fi.dvv.xroad.multitenancytestclient.error.ValidationException;
+import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
 import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionService;
-import org.owasp.esapi.ESAPI;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,20 +19,19 @@ public class TestServiceRestController {
     }
 
     @GetMapping("/random")
-    public RandomNumberDto getRandomInt() {
-        return xroadConnectionService.getRandom();
+    public RandomNumberDto getRandomInt(@AuthenticationPrincipal ConsumerServiceUser principal) {
+        System.out.println("called /random as principal: " + principal.getUsername());
+        System.out.println("principal member code: " + principal.getXroadMemberCode());
+        System.out.println("principal member class: " + principal.getXroadMemberClass());
+        System.out.println("principal token: " + principal.getToken());
+        return xroadConnectionService.getRandom(principal);
     }
 
     @GetMapping("/hello")
-    public MessageDto getGreeting(@RequestParam(value = "name", defaultValue = "") String name) {
-        return xroadConnectionService.getHello(name);
-    }
-
-    private Boolean stringIsEmpty(String s) {
-        return s == null || s.trim().isEmpty();
-    }
-    private void validateName(String name) {
-        if (name.length() > 256)
-            throw new ValidationException("Name is too long. Max length is 256 characters.");
+    public MessageDto getGreeting(
+            @AuthenticationPrincipal ConsumerServiceUser principal
+    ) {
+        System.out.println("called /hello as principal: " + principal.getUsername());
+        return xroadConnectionService.getHello(principal);
     }
 }

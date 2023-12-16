@@ -2,29 +2,21 @@ package fi.dvv.xroad.multitenancytestclient;
 
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
-import org.mockserver.mock.action.ExpectationCallback;
-import org.mockserver.model.Header;
 import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.event.annotation.AfterTestClass;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.matchers.Times.exactly;
-import static org.mockserver.matchers.Times.unlimited;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -50,8 +42,11 @@ class ApiTest {
     @Value("${security-server.service-id}")
     private String serviceId;
 
+    private XroadMockServerTransactions transactions;
+
     @BeforeEach
     public void startServer() {
+        transactions = new XroadMockServerTransactions(serviceId);
         mockServer = startClientAndServer(8181);
     }
 
@@ -60,25 +55,17 @@ class ApiTest {
         mockServer.stop();
     }
 
-
     @Test
     void randomGetsTokenAndRandomNumberThroughSecurityServer() throws Exception {
         assertThat(contextPath).isEqualTo("/rest-api");
 
-        HttpRequest randomRequest = request().withMethod("GET").withPath("/r1/" + serviceId + "/private/random")
-                .withHeader("Authorization", "Bearer foo");
-
+        HttpRequest randomRequest = transactions.getRandomRequest();
         mockServer.when(randomRequest, exactly(2))
-                .respond(response().withStatusCode(200)
-                                .withHeader("content-type", "application/json")
-                                .withBody("{\"data\": 42}"));
+                .respond(transactions.getRandomResponse());
 
-        HttpRequest loginRequest = request().withMethod("GET").withPath("/r1/" + serviceId + "/login");
+        HttpRequest loginRequest = transactions.getLoginRequest();
         mockServer.when(loginRequest, exactly(1))
-                .respond(response().withStatusCode(200)
-                                .withHeader("Authorization", "Bearer foo")
-                                .withHeader("content-type", "application/json")
-                                .withBody("{\"message\": \"Login success\"}"));
+                .respond(transactions.getLoginResponse());
 
         // Call /random twice. First time /login is called if token is not cached. Second call uses cached token.
         assertThat(this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class).data()).isEqualTo(42);
@@ -94,20 +81,14 @@ class ApiTest {
     void helloGetsTokenAndGreetingThroughSecurityServer() throws Exception {
         assertThat(contextPath).isEqualTo("/rest-api");
 
-        HttpRequest helloRequest = request().withMethod("GET").withPath("/r1/" + serviceId + "/private/hello")
-                .withHeader("Authorization", "Bearer foo");
+        HttpRequest helloRequest = transactions.getHelloRequest();
         mockServer.when(helloRequest, exactly(2))
-                .respond(response().withStatusCode(200)
-                                .withHeader("content-type", "application/json")
-                                .withBody("{\"message\": \"Hello\"}"));
+                .respond(transactions.getHelloResponse());
 
 
-        HttpRequest loginRequest = request().withMethod("GET").withPath("/r1/" + serviceId + "/login");
+        HttpRequest loginRequest = transactions.getLoginRequest();
         mockServer.when(loginRequest, exactly(1))
-                .respond(response().withStatusCode(200)
-                                .withHeader("Authorization", "Bearer foo")
-                                .withHeader("content-type", "application/json")
-                                .withBody("{\"message\": \"Login success\"}"));
+                .respond(transactions.getLoginResponse());
 
 
         // Call /hello twice. First time /login is called if token is not cached. Second call uses cached token.

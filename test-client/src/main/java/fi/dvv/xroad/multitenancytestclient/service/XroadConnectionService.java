@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -22,22 +24,39 @@ public class XroadConnectionService {
     @Value("${security-server.url}")
     private String securityServerUrl;
 
+    private RestTemplate restTemplate = new RestTemplate();
+
     public MessageDto getHello(ConsumerServiceUser principal) {
         String uri = securityServerUrl + "/r1/" + serviceId + "/private/hello?name=" + principal.getUsername();
         System.out.println("Calling security server: " + uri);
 
-        HttpEntity httpEntity = getXroadHttpEntity(principal);
-        RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.exchange(uri, HttpMethod.GET, httpEntity, MessageDto.class).getBody();
+        return restGetWithLoginRetry(uri, MessageDto.class, principal);
     }
 
     public RandomNumberDto getRandom(ConsumerServiceUser principal) {
         String uri = securityServerUrl + "/r1/" + serviceId + "/private/random";
         System.out.println("Calling security server: " + uri);
+        return restGetWithLoginRetry(uri, RandomNumberDto.class, principal);
+    }
 
-        HttpEntity httpEntity = getXroadHttpEntity(principal);
-        RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.exchange(uri, HttpMethod.GET, httpEntity, RandomNumberDto.class).getBody();
+    private <T> T restGetWithLoginRetry(
+            String uri,
+            Class<T> responseType,
+            ConsumerServiceUser principal
+    ) {
+        try {
+            HttpEntity httpEntity = getXroadHttpEntity(principal);
+            return restTemplate.exchange(uri, HttpMethod.GET, httpEntity, responseType).getBody();
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                // The token was invalid, so trigger new login by clearing the principal's token
+                principal.setToken(null);
+                HttpEntity httpEntity = getXroadHttpEntity(principal);
+                return restTemplate.exchange(uri, HttpMethod.GET, httpEntity, responseType).getBody();
+            } else {
+                throw e;
+            }
+        }
     }
 
     private void loginPrincipal(ConsumerServiceUser principal) {
@@ -68,6 +87,7 @@ public class XroadConnectionService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Road-Client", clientId);
+        headers.set("X-Road-Represented-Party", principal.getXroadMemberClass() + "/" + principal.getXroadMemberCode());
         headers.set("Authorization", principal.getToken());
         return new HttpEntity(headers);
     }

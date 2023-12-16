@@ -30,7 +30,7 @@ class ApiTest {
 
     private String baseUrl() {
         return "https://localhost:" + port + contextPath;
-    };
+    }
 
     // This autowires to the RestTemplate created in TestRestTemplateClient.
     // It is configured to use the external-consumer-keystore.p12
@@ -44,7 +44,7 @@ class ApiTest {
     ArgumentCaptor<ConsumerServiceUser> principalCaptor;
 
     @Test
-    void getRandomCallsXroad() throws Exception {
+    void getRandomCallsXroad() {
         assertThat(contextPath).isEqualTo("/rest-api");
 
         this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class);
@@ -63,7 +63,7 @@ class ApiTest {
     }
 
     @Test
-    void getHelloCallsXroad() throws Exception {
+    void getHelloCallsXroad() {
         assertThat(contextPath).isEqualTo("/rest-api");
 
         this.restTemplate.getForObject(baseUrl() + "/hello", RandomNumberDto.class);

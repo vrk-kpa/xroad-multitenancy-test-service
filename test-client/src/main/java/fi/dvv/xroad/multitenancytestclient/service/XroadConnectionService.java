@@ -1,6 +1,5 @@
 package fi.dvv.xroad.multitenancytestclient.service;
 
-import fi.dvv.xroad.multitenancytestclient.auth.ConsumerServiceUserDetailsService;
 import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
@@ -25,13 +24,7 @@ public class XroadConnectionService {
     @Value("${security-server.url}")
     private String securityServerUrl;
 
-    private RestTemplate restTemplate = new RestTemplate();
-
-    private final ConsumerServiceUserDetailsService userDetailsService;
-
-    public XroadConnectionService(ConsumerServiceUserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public MessageDto getHello(ConsumerServiceUser principal) {
         String uri = securityServerUrl + "/r1/" + serviceId + "/private/hello?name=" + principal.getUsername();
@@ -52,13 +45,13 @@ public class XroadConnectionService {
             ConsumerServiceUser principal
     ) {
         try {
-            HttpEntity httpEntity = getXroadHttpEntity(principal);
+            HttpEntity<T> httpEntity = getXroadHttpEntity(principal);
             return restTemplate.exchange(uri, HttpMethod.GET, httpEntity, responseType).getBody();
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 // The token was invalid, so trigger new login by clearing the principal's token
                 principal.setToken(null);
-                HttpEntity httpEntity = getXroadHttpEntity(principal);
+                HttpEntity<T> httpEntity = getXroadHttpEntity(principal);
                 return restTemplate.exchange(uri, HttpMethod.GET, httpEntity, responseType).getBody();
             } else {
                 throw e;
@@ -77,17 +70,17 @@ public class XroadConnectionService {
         headers.set("Member-Username", principal.getXroadMemberClass() + "/" + principal.getXroadMemberCode());
         headers.set("Member-Password", principal.getPasswordFromSecretsManager());
 
-        HttpEntity entity = new HttpEntity(headers);
+        HttpEntity<MessageDto> entity = new HttpEntity<>(headers);
 
         System.out.println("Sending headers: " + headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        String jwt = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class).getHeaders().get("Authorization").get(0);
+        String jwt = restTemplate.exchange(uri, HttpMethod.GET, entity, MessageDto.class).getHeaders().get("Authorization").get(0);
         System.out.println("Got JWT: " + jwt);
         principal.setToken(jwt);
     }
 
-    private HttpEntity getXroadHttpEntity(ConsumerServiceUser principal) {
+    private <T> HttpEntity<T> getXroadHttpEntity(ConsumerServiceUser principal) {
         if(principal.getToken() == null){
             loginPrincipal(principal);
         }
@@ -96,6 +89,6 @@ public class XroadConnectionService {
         headers.set("X-Road-Client", clientId);
         headers.set("X-Road-Represented-Party", principal.getXroadMemberClass() + "/" + principal.getXroadMemberCode());
         headers.set("Authorization", principal.getToken());
-        return new HttpEntity(headers);
+        return new HttpEntity<>(headers);
     }
 }

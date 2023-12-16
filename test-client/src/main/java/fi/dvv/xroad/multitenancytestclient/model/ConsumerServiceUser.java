@@ -9,7 +9,7 @@ public class ConsumerServiceUser extends User {
     private final String xroadMemberClass;
     private final String xroadMemberCode;
     private String token;
-    private String passwordInSecretsManager;
+    private final String passwordInSecretsManager;
 
     public ConsumerServiceUser(String username, String password, String xroadMemberClass, String xroadMemberCode) {
         super(username, password, Collections.emptySet());

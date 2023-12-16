@@ -15,7 +15,7 @@ import java.util.HashMap;
 @Service
 public class ConsumerServiceUserDetailsService implements UserDetailsService {
 
-        static private HashMap<String, ConsumerServiceUser> users = new HashMap<>();
+        static private final HashMap<String, ConsumerServiceUser> users = new HashMap<>();
         static {
             users.put("org1.com", new ConsumerServiceUser(
                     "org1.com",

@@ -1,12 +1,12 @@
 package fi.dvv.xroad.multitenancytestclient;
 
-import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
+import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionService;
 import org.junit.jupiter.api.Test;
-import org.mockserver.integration.ClientAndServer;
-import org.mockserver.model.HttpRequest;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,11 +15,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.matchers.Times.exactly;
+
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "mock-xroad-connection-service"})
 class ApiTest {
 
     @LocalServerPort
@@ -37,67 +37,47 @@ class ApiTest {
     @Autowired
     private RestTemplate restTemplate;
 
-    private ClientAndServer mockServer;
+    @Autowired
+    private XroadConnectionService xroadConnectionService;
 
-    @Value("${security-server.service-id}")
-    private String serviceId;
+    @Captor
+    ArgumentCaptor<ConsumerServiceUser> principalCaptor;
 
-    private XroadMockServerTransactions transactions;
+    @Test
+    void getRandomCallsXroad() throws Exception {
+        assertThat(contextPath).isEqualTo("/rest-api");
 
-    @BeforeEach
-    public void startServer() {
-        transactions = new XroadMockServerTransactions(serviceId);
-        mockServer = startClientAndServer(8181);
-    }
+        this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class);
 
-    @AfterEach
-    public void stopServer() {
-        mockServer.stop();
+        Mockito.verify(
+                xroadConnectionService,
+                Mockito.times(1)
+        ).getRandom(principalCaptor.capture());
+
+        ConsumerServiceUser principal = principalCaptor.getValue();
+        assertThat(principal.getXroadMemberClass()).isEqualTo("GOV");
+        assertThat(principal.getXroadMemberCode()).isEqualTo("11111-1");
+        assertThat(principal.getUsername()).isEqualTo("org1.com");
+        assertThat(principal.getPasswordFromSecretsManager()).isEqualTo("password");
+        assertThat(principal.getToken()).isNull();
     }
 
     @Test
-    void randomGetsTokenAndRandomNumberThroughSecurityServer() throws Exception {
+    void getHelloCallsXroad() throws Exception {
         assertThat(contextPath).isEqualTo("/rest-api");
 
-        HttpRequest randomRequest = transactions.getRandomRequest();
-        mockServer.when(randomRequest, exactly(2))
-                .respond(transactions.getRandomResponse());
+        this.restTemplate.getForObject(baseUrl() + "/hello", RandomNumberDto.class);
 
-        HttpRequest loginRequest = transactions.getLoginRequest();
-        mockServer.when(loginRequest, exactly(1))
-                .respond(transactions.getLoginResponse());
+        Mockito.verify(
+                xroadConnectionService,
+                Mockito.times(1)
+        ).getHello(principalCaptor.capture());
 
-        // Call /random twice. First time /login is called if token is not cached. Second call uses cached token.
-        assertThat(this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class).data()).isEqualTo(42);
-        assertThat(this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class).data()).isEqualTo(42);
-
-        assertThat(this.mockServer.retrieveRecordedRequests(randomRequest)).hasSize(2);
-
-        // The login is called 0 or 1 times, depending on whether the token was already cached.
-        assertThat(this.mockServer.retrieveRecordedRequests(loginRequest)).hasSizeLessThan(2);
-    }
-
-    @Test
-    void helloGetsTokenAndGreetingThroughSecurityServer() throws Exception {
-        assertThat(contextPath).isEqualTo("/rest-api");
-
-        HttpRequest helloRequest = transactions.getHelloRequest();
-        mockServer.when(helloRequest, exactly(2))
-                .respond(transactions.getHelloResponse());
-
-
-        HttpRequest loginRequest = transactions.getLoginRequest();
-        mockServer.when(loginRequest, exactly(1))
-                .respond(transactions.getLoginResponse());
-
-
-        // Call /hello twice. First time /login is called if token is not cached. Second call uses cached token.
-        assertThat(this.restTemplate.getForObject(baseUrl() + "/hello", MessageDto.class).message()).isEqualTo("Hello");
-        assertThat(this.restTemplate.getForObject(baseUrl() + "/hello", MessageDto.class).message()).isEqualTo("Hello");
-
-        assertThat(this.mockServer.retrieveRecordedRequests(helloRequest)).hasSize(2);
-
-        // The login is called 0 or 1 times, depending on whether the token was already cached.
-        assertThat(this.mockServer.retrieveRecordedRequests(loginRequest)).hasSizeLessThan(2);
+        ConsumerServiceUser principal = principalCaptor.getValue();
+        assertThat(principal.getXroadMemberClass()).isEqualTo("GOV");
+        assertThat(principal.getXroadMemberCode()).isEqualTo("11111-1");
+        assertThat(principal.getUsername()).isEqualTo("org1.com");
+        assertThat(principal.getPasswordFromSecretsManager()).isEqualTo("password");
+        assertThat(principal.getToken()).isNull();
     }
 }

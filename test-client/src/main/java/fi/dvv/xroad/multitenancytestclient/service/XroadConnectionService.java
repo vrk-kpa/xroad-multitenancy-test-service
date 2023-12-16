@@ -1,5 +1,6 @@
 package fi.dvv.xroad.multitenancytestclient.service;
 
+import fi.dvv.xroad.multitenancytestclient.auth.ConsumerServiceUserDetailsService;
 import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
@@ -25,6 +26,12 @@ public class XroadConnectionService {
     private String securityServerUrl;
 
     private RestTemplate restTemplate = new RestTemplate();
+
+    private final ConsumerServiceUserDetailsService userDetailsService;
+
+    public XroadConnectionService(ConsumerServiceUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     public MessageDto getHello(ConsumerServiceUser principal) {
         String uri = securityServerUrl + "/r1/" + serviceId + "/private/hello?name=" + principal.getUsername();
@@ -68,7 +75,7 @@ public class XroadConnectionService {
         headers.set("X-Road-Client", clientId);
         headers.set("X-Road-Represented-Party", principal.getXroadMemberClass() + "/" + principal.getXroadMemberCode());
         headers.set("Member-Username", principal.getXroadMemberClass() + "/" + principal.getXroadMemberCode());
-        headers.set("Member-Password", "password");
+        headers.set("Member-Password", principal.getPasswordFromSecretsManager());
 
         HttpEntity entity = new HttpEntity(headers);
 

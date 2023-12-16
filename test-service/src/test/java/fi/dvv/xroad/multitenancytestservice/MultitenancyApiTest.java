@@ -67,7 +67,7 @@ class MultitenancyApiTest {
 
     @Test
     void getRandomWithExpiredJwtReturnsUnauthorized() throws Exception {
-        String jwt = jwtService.generateJwt("FOO/12345-6", Date.from(Instant.now().minusSeconds(60*60*2 /* == 2 hours */)));
+        String jwt = jwtService.generateJwt("FOO/12345-6", Date.from(Instant.now().minusSeconds(60*60*2)));
 
         String randomUrl = "http://localhost:" + port + contextPath + "/private/random";
         HttpHeaders randomHeaders = new HttpHeaders();

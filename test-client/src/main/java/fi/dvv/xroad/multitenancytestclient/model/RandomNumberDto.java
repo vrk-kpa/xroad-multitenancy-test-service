@@ -1,3 +1,3 @@
 package fi.dvv.xroad.multitenancytestclient.model;
 
-public record RandomNumberDto(int randomNumber) {}
+public record RandomNumberDto(int data) {}

@@ -127,3 +127,9 @@ When testing locally you must add the following line to `/etc/hosts` to match th
 ```
 127.0.0.1 xroad-multitenancy-test-client
 ```
+
+
+## test-client unit test keystores
+
+The keystores used by test-client unit tests are included in the git repo. 
+You can refer to ``test-client/src/test/resources/crete-keystores.sh`` to see how they are created.

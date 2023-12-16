@@ -1,0 +1,14 @@
+server:
+    port: 8443
+    ssl:
+        key-store-type: "PKCS12"
+        key-store: "classpath:multitenancy-client-keystore.p12"
+        key-store-password: "changeit"
+        key-alias: "xroad-multitenancy-test-client"
+        key-password: "changeit"
+        client-auth: need
+        trust-store: "classpath:multitenancy-client-truststore.p12"
+        trust-store-password: "changeit"
+
+security-server:
+    url: http://localhost:8181

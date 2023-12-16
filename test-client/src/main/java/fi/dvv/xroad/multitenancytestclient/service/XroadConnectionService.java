@@ -27,7 +27,6 @@ public class XroadConnectionService {
         System.out.println("Calling security server: " + uri);
 
         HttpEntity httpEntity = getXroadHttpEntity(principal);
-        httpEntity.getHeaders().set("Authorization", principal.getToken());
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate.exchange(uri, HttpMethod.GET, httpEntity, MessageDto.class).getBody();
     }
@@ -57,7 +56,7 @@ public class XroadConnectionService {
         System.out.println("Sending headers: " + headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        String jwt = restTemplate.exchange(uri, HttpMethod.GET, entity, MessageDto.class).getHeaders().get("Authorization").get(0);
+        String jwt = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class).getHeaders().get("Authorization").get(0);
         System.out.println("Got JWT: " + jwt);
         principal.setToken(jwt);
     }

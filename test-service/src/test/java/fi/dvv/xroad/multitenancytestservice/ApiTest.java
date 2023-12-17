@@ -33,7 +33,7 @@ class ApiTest {
     
     @Test
     void randomReturnsRandomNumber() throws Exception {
-        assertThat(this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class).randomNumber()).isGreaterThanOrEqualTo(1).isLessThanOrEqualTo(100);
+        assertThat(this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class).data()).isGreaterThanOrEqualTo(1).isLessThanOrEqualTo(100);
     }
 
     @Test

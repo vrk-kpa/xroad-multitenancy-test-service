@@ -106,7 +106,7 @@ class MultitenancyApiTest {
         randomHeaders.set("Authorization", "Bearer " + jwt);
         HttpEntity randomEntity = new HttpEntity(randomHeaders);
         RandomNumberDto randomNumberDto = restTemplate.exchange(randomUrl, HttpMethod.GET, randomEntity, RandomNumberDto.class).getBody();
-        assertThat(randomNumberDto.randomNumber()).isGreaterThanOrEqualTo(1).isLessThanOrEqualTo(100);
+        assertThat(randomNumberDto.data()).isGreaterThanOrEqualTo(1).isLessThanOrEqualTo(100);
     }
 
     @Test

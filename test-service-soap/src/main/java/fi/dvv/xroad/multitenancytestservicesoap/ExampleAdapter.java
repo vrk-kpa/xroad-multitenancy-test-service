@@ -22,11 +22,13 @@
  */
 package fi.dvv.xroad.multitenancytestservicesoap;
 
+import org.apache.catalina.User;
 import org.niis.xrd4j.common.exception.XRd4JException;
 import org.niis.xrd4j.common.message.ErrorMessage;
 import org.niis.xrd4j.common.message.ServiceRequest;
 import org.niis.xrd4j.common.message.ServiceResponse;
 import org.niis.xrd4j.common.util.PropertiesUtil;
+import org.niis.xrd4j.common.util.SOAPHelper;
 import org.niis.xrd4j.server.AbstractAdapterServlet;
 import org.niis.xrd4j.server.deserializer.AbstractCustomRequestDeserializer;
 import org.niis.xrd4j.server.deserializer.CustomRequestDeserializer;
@@ -35,11 +37,9 @@ import org.niis.xrd4j.server.serializer.ServiceResponseSerializer;
 
 import java.util.Properties;
 import java.util.Random;
-import javax.xml.soap.Node;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
+import javax.xml.namespace.QName;
+import javax.xml.soap.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,59 +88,25 @@ public class ExampleAdapter extends AbstractAdapterServlet {
     @Override
     protected ServiceResponse handleRequest(ServiceRequest request) throws SOAPException, XRd4JException {
         ServiceResponseSerializer serializer;
+
+        String partyClass = deserializeRepresentedPartyChild(request, "partyClass");
+        String partyCode = deserializeRepresentedPartyChild(request, "partyCode");
+
+        String serviceCode = request.getProducer().getServiceCode();
+
+        if ("authenticate".equals(serviceCode)) {
+            return processAuthenticateRequest(request, partyClass, partyCode);
+        }
+
+        if (!verifyToken(request)){
+            return processUnauthorizedRequest(request);
+        }
+
         // Process services by service code
-        if ("getRandom".equals(request.getProducer().getServiceCode())) {
-            // Process "getRandom" service
-            logger.info("Process \"getRandom\" service.");
-            // Create a new response serializer that serializes the response
-            // to SOAP. Request contains no data, so in this case we don't
-            // need a request deserializer
-            serializer = new ServiceResponseSerializerImpl();
-            // Create a new ServiceResponse object
-            ServiceResponse<String, String> response = new ServiceResponse<>(request.getConsumer(), request.getProducer(), request.getId());
-            // Set namespace of the SOAP response
-            response.getProducer().setNamespaceUrl(this.namespaceSerialize);
-            response.getProducer().setNamespacePrefix(this.prefix);
-            // Set response data - a random number between 0 and 100
-            response.setResponseData(Integer.toString((int) new Random().nextInt(101)));
-            // Serialize the response to SOAP
-            serializer.serialize(response, request);
-            // Return the response - AbstractAdapterServlet takes care of
-            // the rest
-            return response;
-        } else if ("helloService".equals(request.getProducer().getServiceCode())) {
-            // Process "helloService" service
-            logger.info("Process \"helloService\" service.");
-            // Create a new response serializer that serializes the response
-            // to SOAP
-            serializer = new HelloServiceResponseSerializer();
-            // Create a custom request deserializer that parses the request
-            // data from the SOAP request
-            CustomRequestDeserializer customDeserializer = new CustomRequestDeserializerImpl();
-            // Parse the request data from the request
-            customDeserializer.deserialize(request, this.namespaceDeserialize);
-            // Create a new ServiceResponse object
-            ServiceResponse<String, String> response = new ServiceResponse<>(request.getConsumer(), request.getProducer(), request.getId());
-            // Set namespace of the SOAP response
-            response.getProducer().setNamespaceUrl(this.namespaceSerialize);
-            response.getProducer().setNamespacePrefix(this.prefix);
-            logger.debug("Do message prosessing...");
-            if (request.getRequestData() != null) {
-                // If request data is not null, add response data to the
-                // response object
-                response.setResponseData("Hello " + request.getRequestData() + "! Greetings from adapter server!");
-            } else {
-                // No request data is found - an error message is returned
-                logger.warn("No \"name\" parameter found. Return a non-techinal error message.");
-                ErrorMessage error = new ErrorMessage("422", "422 Unprocessable Entity. Missing \"name\" element.");
-                response.setErrorMessage(error);
-            }
-            logger.debug("Message prosessing done!");
-            // Serialize the response to SOAP
-            serializer.serialize(response, request);
-            // Return the response - AbstractAdapterServlet takes care of
-            // the rest
-            return response;
+        if ("getRandom".equals(serviceCode)) {
+            return processGetRandomRequest(request);
+        } else if ("helloService".equals(serviceCode)) {
+            return processHelloServiceRequest(request, partyClass, partyCode);
         }
 
         // No service matching the service code in the request was found -
@@ -151,6 +117,127 @@ public class ExampleAdapter extends AbstractAdapterServlet {
         response.setErrorMessage(error);
         serializer.serialize(response, request);
         return response;
+    }
+
+    private boolean verifyToken(ServiceRequest request) {
+        String token = request.getSecurityToken();
+        if (token == null) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean verifyUserAuth(UserAuth userAuth, String partyClass, String partyCode) {
+        return (userAuth != null
+                && userAuth.getUsername() != null
+                && userAuth.getPassword() != null
+                && userAuth.getUsername().equals(partyClass + ":" + partyCode)
+                && userAuth.getPassword().equals("password"));
+    }
+
+    private ServiceResponse<String, String> processAuthenticateRequest(ServiceRequest request, String partyClass, String partyCode) throws SOAPException, XRd4JException {
+        ServiceResponseSerializer serializer = new ServiceResponseSerializerImpl();
+
+        logger.info("Process \"authenticate\" service.");
+
+        AuthenticateRequestDeserializer deserializer = new AuthenticateRequestDeserializer();
+        deserializer.deserialize(request, this.namespaceDeserialize);
+
+        ServiceResponse<String, String> response = new ServiceResponse<>(request.getConsumer(), request.getProducer(), request.getId());
+        response.getProducer().setNamespaceUrl(this.namespaceSerialize);
+        response.getProducer().setNamespacePrefix(this.prefix);
+
+        UserAuth userAuth = (UserAuth) request.getRequestData();
+
+        if (!verifyUserAuth(userAuth, partyClass, partyCode)) {
+            // No request data is found - an error message is returned
+            logger.warn("Authentication failed.");
+            ErrorMessage error = new ErrorMessage("SOAP-ENV:Client", "Invalid parameters for authentication.");
+            response.setErrorMessage(error);
+            serializer.serialize(response, request);
+            return response;
+        }
+
+        response.setResponseData("OK");
+
+        serializer.serialize(response, request);
+
+        // Add the token header
+        SOAPHeader header = response.getSoapMessage().getSOAPHeader();
+        SOAPHeaderElement tokenElement = header.addHeaderElement(new QName("http://x-road.eu/xsd/security-token.xsd", "securityToken", "extsec"));
+        tokenElement.addAttribute(new QName("tokenType"), "urn:ietf:params:oauth:token-type:jwt");
+        tokenElement.addTextNode("replace me with a real jwt token");
+
+
+        // Return the response - AbstractAdapterServlet takes care of the rest
+        return response;
+    }
+
+    private ServiceResponse<String, String> processUnauthorizedRequest(ServiceRequest request) throws SOAPException, XRd4JException {
+        ServiceResponseSerializer serializer = new ServiceResponseSerializerImpl();
+        ServiceResponse<String, String> response = new ServiceResponse();
+        ErrorMessage error = new ErrorMessage("SOAP-ENV:Client", "Access denied, invalid token.", null, null);
+        response.setErrorMessage(error);
+        serializer.serialize(response, request);
+        return response;
+    }
+
+    private ServiceResponse<String, String> processHelloServiceRequest(ServiceRequest request, String partyClass, String partyCode) throws SOAPException, XRd4JException {
+        ServiceResponseSerializer serializer;
+        logger.info("Process \"helloService\" service.");
+        serializer = new HelloServiceResponseSerializer();
+
+        HelloRequestDeserializer deserializer = new HelloRequestDeserializer();
+        deserializer.deserialize(request, this.namespaceDeserialize);
+        ServiceResponse<String, String> response = new ServiceResponse<>(request.getConsumer(), request.getProducer(), request.getId());
+        response.getProducer().setNamespaceUrl(this.namespaceSerialize);
+        response.getProducer().setNamespacePrefix(this.prefix);
+
+        logger.debug("Do message prosessing...");
+        if (request.getRequestData() != null) {
+            response.setResponseData("Hello " + request.getRequestData() + ", representing " + partyClass + ":" + partyCode + "! Greetings from adapter server!");
+        } else {
+            // No request data is found - an error message is returned
+            logger.warn("No \"name\" parameter found. Return a non-techinal error message.");
+            ErrorMessage error = new ErrorMessage("422", "422 Unprocessable Entity. Missing \"name\" element.");
+            response.setErrorMessage(error);
+        }
+        logger.debug("Message prosessing done!");
+        serializer.serialize(response, request);
+
+        // Return the response - AbstractAdapterServlet takes care of the rest
+        return response;
+    }
+
+    private ServiceResponse<String, String> processGetRandomRequest(ServiceRequest request) throws XRd4JException {
+        ServiceResponseSerializer serializer;
+        logger.info("Process \"getRandom\" service.");
+        serializer = new ServiceResponseSerializerImpl();
+        ServiceResponse<String, String> response = new ServiceResponse<>(request.getConsumer(), request.getProducer(), request.getId());
+        response.getProducer().setNamespaceUrl(this.namespaceSerialize);
+        response.getProducer().setNamespacePrefix(this.prefix);
+        response.setResponseData(Integer.toString((int) new Random().nextInt(101)));
+        serializer.serialize(response, request);
+        // Return the response - AbstractAdapterServlet takes care of the rest
+        return response;
+    }
+
+
+
+    /**
+     * Deserialize values of X-Road RepresentedParty header.
+     * This should be properly implemented in the xrd4j library.
+     *
+     */
+    private static String deserializeRepresentedPartyChild(ServiceRequest request, String childName) throws SOAPException {
+        Node representedParty = SOAPHelper.getNode(request.getSoapMessage().getSOAPHeader(), "representedParty");
+
+        if (representedParty != null) {
+            Node childNode = SOAPHelper.getNode(representedParty, childName);
+            if(childNode != null)
+                return childNode.getTextContent();
+        }
+        return null;
     }
 
     /**
@@ -206,7 +293,7 @@ public class ExampleAdapter extends AbstractAdapterServlet {
      * service requests. The type declaration "<String>" defines the type of the
      * request data, which in this case is String.
      */
-    private class CustomRequestDeserializerImpl extends AbstractCustomRequestDeserializer<String> {
+    private class HelloRequestDeserializer extends AbstractCustomRequestDeserializer<String> {
 
         /**
          * Deserializes the "request" element.
@@ -231,6 +318,51 @@ public class ExampleAdapter extends AbstractAdapterServlet {
             }
             logger.warn("No \"name\" element found. Null is returned.");
             return null;
+        }
+    }
+
+    private class UserAuth {
+        private String username;
+        private String password;
+
+        public UserAuth(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+    }
+
+    private class AuthenticateRequestDeserializer extends AbstractCustomRequestDeserializer<UserAuth> {
+
+        /**
+         * Deserializes the "request" element.
+         *
+         * @param requestNode request element
+         * @return content of the request element
+         */
+        @Override
+        protected UserAuth deserializeRequest(Node requestNode, SOAPMessage message) throws SOAPException {
+            if (requestNode == null) {
+                logger.warn("\"requestNode\" is null. Null is returned.");
+                return null;
+            }
+
+            Node usernameNode = SOAPHelper.getNode(requestNode, "username");
+            Node passwordNode = SOAPHelper.getNode(requestNode, "password");
+
+            if (usernameNode == null || passwordNode == null) {
+                logger.warn("\"usernameNode\" or \"passwordNode\" is null. Null is returned.");
+                return null;
+            }
+
+            return new UserAuth(usernameNode.getTextContent(), passwordNode.getTextContent());
         }
     }
 }

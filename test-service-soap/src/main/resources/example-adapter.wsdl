@@ -3,7 +3,8 @@
                   xmlns:tns="http://test.x-road.global/producer"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   xmlns:xrd="http://x-road.eu/xsd/xroad.xsd"
-                  xmlns:xrd-repr="http://x-road.eu/xsd/representation.xsd"
+                  xmlns:repr="http://x-road.eu/xsd/representation.xsd"
+                  xmlns:extsec="http://x-road.eu/xsd/security-token.xsd"
                   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                   xmlns:id="http://x-road.eu/xsd/identifiers"
                   name="testService" targetNamespace="http://test.x-road.global/producer">
@@ -11,7 +12,8 @@
         <xsd:schema elementFormDefault="qualified" targetNamespace="http://test.x-road.global/producer">
             <!-- Import X-Road schema -->
             <xsd:import id="xrd" namespace="http://x-road.eu/xsd/xroad.xsd" schemaLocation="http://x-road.eu/xsd/xroad.xsd"/>
-            <xsd:import id="xrd-repr" namespace="http://x-road.eu/xsd/representation.xsd" schemaLocation="http://x-road.eu/xsd/representation.xsd"/>
+            <xsd:import id="repr" namespace="http://x-road.eu/xsd/representation.xsd" schemaLocation="http://x-road.eu/xsd/representation.xsd"/>
+            <xsd:import id="extsec" namespace="http://x-road.eu/xsd/security-token.xsd" schemaLocation="http://x-road.eu/xsd/security-token.xsd"/>
 
             <xsd:element name="getRandom" nillable="true">
                 <xsd:complexType />
@@ -74,7 +76,8 @@
         <wsdl:part name="id" element="xrd:id" />
         <wsdl:part name="issue" element="xrd:issue"/>
         <wsdl:part name="protocolVersion" element="xrd:protocolVersion" />
-        <wsdl:part name="representedParty" element="xrd-repr:representedParty" />
+        <wsdl:part name="representedParty" element="repr:representedParty" />
+        <wsdl:part name="securityToken" element="extsec:securityToken" />
     </wsdl:message>
 
     <wsdl:message name="getRandom">

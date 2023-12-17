@@ -52,9 +52,8 @@ class SoapApiTest {
     };
     
     @Test
-    void soapEndpointReturnsSomething() throws IOException {
-
-        String request = readRequestFile("test-request-1.xml");
+    void helloServiceReturnsGreeting() throws IOException {
+        String request = readRequestFile("hello-service-request.xml");
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.TEXT_XML);
@@ -63,6 +62,33 @@ class SoapApiTest {
         String responseString = response.getBody();
 
         assertThat(responseString).contains("Erkki Esimerkki");
+    }
+
+    @Test
+    void helloServiceReturnsUnauthorizedWhenCalledWithoutToken() throws IOException {
+        String request = readRequestFile("hello-service-no-token-request.xml");
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.TEXT_XML);
+        HttpEntity entity = new HttpEntity<>(request, header);
+        ResponseEntity<String> response = restTemplate.exchange(baseUrl() + "/example-adapter/Endpoint", HttpMethod.POST, entity, String.class);
+        String responseString = response.getBody();
+
+        assertThat(responseString).contains("invalid token");
+    }
+
+    @Test
+    void authenticateRequestReturnsToken() throws IOException {
+
+        String request = readRequestFile("authenticate-request.xml");
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.TEXT_XML);
+        HttpEntity entity = new HttpEntity<>(request, header);
+        ResponseEntity<String> response = restTemplate.exchange(baseUrl() + "/example-adapter/Endpoint", HttpMethod.POST, entity, String.class);
+        String responseString = response.getBody();
+
+        assertThat(responseString).contains("<extsec:securityToken");
     }
 
     private String readRequestFile(String filename) throws IOException {

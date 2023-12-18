@@ -71,7 +71,7 @@ class ApiTest {
         Mockito.verify(
                 xroadConnectionService,
                 Mockito.times(1)
-        ).getHello(principalCaptor.capture());
+        ).getHello(principalCaptor.capture(), Mockito.any());
 
         ConsumerServiceUser principal = principalCaptor.getValue();
         assertThat(principal.getXroadMemberClass()).isEqualTo("GOV");

@@ -109,7 +109,7 @@ public class TestXroadConnectionService {
         HttpRequest helloRequest = transactions.getHelloRequest();
         mockServer.when(helloRequest, exactly(1)).respond(transactions.getHelloResponse());
 
-        MessageDto response = service.getHello(principal);
+        MessageDto response = service.getHello(principal, "foo");
 
         assertThat(mockServer.retrieveRecordedRequests(helloRequest)).hasSize(1);
         assertThat(response.message()).isEqualTo("Hello"); // the mock value
@@ -125,7 +125,7 @@ public class TestXroadConnectionService {
         HttpRequest helloRequest = transactions.getHelloRequest();
         mockServer.when(helloRequest, exactly(1)).respond(transactions.getHelloResponse());
 
-        MessageDto response = service.getHello(principal);
+        MessageDto response = service.getHello(principal, "foo");
 
         assertThat(mockServer.retrieveRecordedRequests(loginRequest)).hasSize(1);
         assertThat(mockServer.retrieveRecordedRequests(helloRequest)).hasSize(1);
@@ -147,7 +147,7 @@ public class TestXroadConnectionService {
         HttpRequest succeedingHelloRequest = transactions.getHelloRequest();
         mockServer.when(succeedingHelloRequest, exactly(1)).respond(transactions.getHelloResponse());
 
-        MessageDto response = service.getHello(principal);
+        MessageDto response = service.getHello(principal, "foo");
 
         assertThat(mockServer.retrieveRecordedRequests(failingHelloRequest)).hasSize(1);
         assertThat(mockServer.retrieveRecordedRequests(loginRequest)).hasSize(1);

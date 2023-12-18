@@ -26,8 +26,8 @@ public class XroadConnectionService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public MessageDto getHello(ConsumerServiceUser principal) {
-        String uri = securityServerUrl + "/r1/" + serviceId + "/private/hello?name=" + principal.getUsername();
+    public MessageDto getHello(ConsumerServiceUser principal, String name) {
+        String uri = securityServerUrl + "/r1/" + serviceId + "/private/hello?name=" + name;
         System.out.println("Calling security server: " + uri);
 
         return restGetWithLoginRetry(uri, MessageDto.class, principal);

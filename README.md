@@ -3,7 +3,8 @@
 A test service to demonstrate X-Road multitenancy with REST services.
 
 ## Dependencies
- * Java 17
+ * Java 17 for test-client and test-service
+ * Java 11 for test-service-soap
  * Maven
  * Docker for local development
 
@@ -57,8 +58,35 @@ curl -v \
 ```
 
 ## Generating keys and certificates
-### test-service
-Needs a key-pair to create JWTs.
+### test-service and test-service-soap
+Need key-pairs to create JWTs.
+```shell
+keytool -genkeypair \
+    -alias xroad-multi-tenancy-test \
+    -keyalg RSA \
+    -keysize 4096 \
+    -validity 3650 \
+    -dname "CN=xroad-multitenancy-test-service,OU=suomi-fi-palveluvayla,O=DVV,L=,S=CA,C=U" \
+    -keypass changeit \
+    -keystore test-service/keys/keys.p12 \
+    -storeType PKCS12 \
+    -storepass changeit
+```
+
+```shell
+keytool -genkeypair \
+    -alias xroad-multi-tenancy-test \
+    -keyalg RSA \
+    -keysize 4096 \
+    -validity 3650 \
+    -dname "CN=xroad-multitenancy-test-service-soap,OU=suomi-fi-palveluvayla,O=DVV,L=,S=CA,C=U" \
+    -keypass changeit \
+    -keystore test-service-soap/keys/keys.p12 \
+    -storeType PKCS12 \
+    -storepass changeit
+```
+
+
 
 ### test-client
 Needs a certificate for SSL:

@@ -22,8 +22,9 @@
  */
 package fi.dvv.xroad.multitenancytestservicesoap;
 
-import org.apache.catalina.User;
+import com.nimbusds.jose.JOSEException;
 import org.niis.xrd4j.common.exception.XRd4JException;
+import org.niis.xrd4j.common.exception.XRd4JRuntimeException;
 import org.niis.xrd4j.common.message.ErrorMessage;
 import org.niis.xrd4j.common.message.ServiceRequest;
 import org.niis.xrd4j.common.message.ServiceResponse;
@@ -31,10 +32,10 @@ import org.niis.xrd4j.common.util.PropertiesUtil;
 import org.niis.xrd4j.common.util.SOAPHelper;
 import org.niis.xrd4j.server.AbstractAdapterServlet;
 import org.niis.xrd4j.server.deserializer.AbstractCustomRequestDeserializer;
-import org.niis.xrd4j.server.deserializer.CustomRequestDeserializer;
 import org.niis.xrd4j.server.serializer.AbstractServiceResponseSerializer;
 import org.niis.xrd4j.server.serializer.ServiceResponseSerializer;
 
+import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 import javax.xml.namespace.QName;
@@ -42,6 +43,7 @@ import javax.xml.soap.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * This class implements two simple X-Road 6 and X-Road 7 compatible services:
@@ -52,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author Petteri Kivimäki
  * @author Raido Kaju
  */
+@Component
 public class ExampleAdapter extends AbstractAdapterServlet {
 
     private Properties props;
@@ -59,6 +62,13 @@ public class ExampleAdapter extends AbstractAdapterServlet {
     private String namespaceSerialize;
     private String namespaceDeserialize;
     private String prefix;
+
+    private final JwtService jwtService;
+
+    public ExampleAdapter(JwtService jwtService) {
+        super();
+        this.jwtService = jwtService;
+    }
 
     @Override
     public void init() {
@@ -95,7 +105,11 @@ public class ExampleAdapter extends AbstractAdapterServlet {
         String serviceCode = request.getProducer().getServiceCode();
 
         if ("authenticate".equals(serviceCode)) {
-            return processAuthenticateRequest(request, partyClass, partyCode);
+            try {
+                return processAuthenticateRequest(request, partyClass, partyCode);
+            } catch (JOSEException e) {
+                throw new XRd4JRuntimeException("Failed to generate JWT");
+            }
         }
 
         if (!verifyToken(request)){
@@ -121,10 +135,7 @@ public class ExampleAdapter extends AbstractAdapterServlet {
 
     private boolean verifyToken(ServiceRequest request) {
         String token = request.getSecurityToken();
-        if (token == null) {
-            return false;
-        }
-        return true;
+        return jwtService.validateJwt(token);
     }
 
     private boolean verifyUserAuth(UserAuth userAuth, String partyClass, String partyCode) {
@@ -135,7 +146,7 @@ public class ExampleAdapter extends AbstractAdapterServlet {
                 && userAuth.getPassword().equals("password"));
     }
 
-    private ServiceResponse<String, String> processAuthenticateRequest(ServiceRequest request, String partyClass, String partyCode) throws SOAPException, XRd4JException {
+    private ServiceResponse<String, String> processAuthenticateRequest(ServiceRequest request, String partyClass, String partyCode) throws SOAPException, XRd4JException, JOSEException {
         ServiceResponseSerializer serializer = new ServiceResponseSerializerImpl();
 
         logger.info("Process \"authenticate\" service.");
@@ -162,11 +173,13 @@ public class ExampleAdapter extends AbstractAdapterServlet {
 
         serializer.serialize(response, request);
 
+        String token = jwtService.generateJwt(partyClass + ":" + partyCode, new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2));
+
         // Add the token header
         SOAPHeader header = response.getSoapMessage().getSOAPHeader();
         SOAPHeaderElement tokenElement = header.addHeaderElement(new QName("http://x-road.eu/xsd/security-token.xsd", "securityToken", "extsec"));
         tokenElement.addAttribute(new QName("tokenType"), "urn:ietf:params:oauth:token-type:jwt");
-        tokenElement.addTextNode("replace me with a real jwt token");
+        tokenElement.addTextNode(token);
 
 
         // Return the response - AbstractAdapterServlet takes care of the rest
@@ -221,8 +234,6 @@ public class ExampleAdapter extends AbstractAdapterServlet {
         // Return the response - AbstractAdapterServlet takes care of the rest
         return response;
     }
-
-
 
     /**
      * Deserialize values of X-Road RepresentedParty header.

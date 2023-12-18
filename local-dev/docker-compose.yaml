@@ -15,6 +15,15 @@ services:
     ports:
       - 8070:8080
 
+  test-service-soap:
+    build:
+      context: ../test-service-soap
+      dockerfile: ./Dockerfile
+    volumes:
+      - ${PWD}/../test-service-soap/keys/keys.p12:/app/keys/keys.p12:ro
+    ports:
+      - 8060:8080
+
   test-client:
     build:
       context: ../test-client

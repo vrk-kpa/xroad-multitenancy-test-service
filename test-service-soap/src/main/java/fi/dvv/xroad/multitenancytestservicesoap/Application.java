@@ -36,13 +36,19 @@ import org.springframework.context.annotation.Configuration;
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {
 
+    private final ExampleAdapter exampleAdapter;
+
+    public Application(ExampleAdapter exampleAdapter) {
+        this.exampleAdapter = exampleAdapter;
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 
     @Bean
     public ServletRegistrationBean endpointBean() {
-        ServletRegistrationBean bean = new ServletRegistrationBean(new ExampleAdapter(), "/Endpoint");
+        ServletRegistrationBean bean = new ServletRegistrationBean(exampleAdapter, "/Endpoint");
         bean.setLoadOnStartup(1);
         return bean;
     }

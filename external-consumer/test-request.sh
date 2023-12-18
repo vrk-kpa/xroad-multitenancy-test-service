@@ -3,7 +3,7 @@ ENDPOINT="${2:-random}"
 
 echo "requesting $ENDPOINT as $ORG"
 
-curl \
+curl -v \
   --cert "$ORG/certs/cert.pem"\
   --key "$ORG/certs/privatekey.pem" \
   --cacert "trusted-certs/test-client-cert.pem" \

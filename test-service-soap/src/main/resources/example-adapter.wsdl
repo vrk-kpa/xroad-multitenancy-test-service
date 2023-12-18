@@ -66,6 +66,48 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:element name="authenticate">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="username" type="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Username
+                                </xsd:documentation>
+                                <xsd:appinfo>
+                                    <xrd:title xml:lang="en">Username</xrd:title>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element name="password" type="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Password
+                                </xsd:documentation>
+                                <xsd:appinfo>
+                                    <xrd:title xml:lang="en">Password</xrd:title>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="authenticateResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="message" type="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Service response
+                                </xsd:documentation>
+                                <xsd:appinfo>
+                                    <xrd:title xml:lang="en">Authentication response</xrd:title>
+                                </xsd:appinfo>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
         </xsd:schema>
     </wsdl:types>
 
@@ -92,6 +134,12 @@
     <wsdl:message name="helloServiceResponse">
         <wsdl:part name="body" element="tns:helloServiceResponse"/>
     </wsdl:message>
+    <wsdl:message name="authenticate">
+        <wsdl:part name="body" element="tns:authenticate"/>
+    </wsdl:message>
+    <wsdl:message name="authenticateResponse">
+        <wsdl:part name="body" element="tns:authenticateResponse"/>
+    </wsdl:message>
 
     <wsdl:portType name="testServicePortType">
         <wsdl:operation name="getRandom">
@@ -110,6 +158,14 @@
             <wsdl:input message="tns:helloService"/>
             <wsdl:output message="tns:helloServiceResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="authenticate">
+            <wsdl:documentation>
+                <xrd:title xml:lang="en">Authenticate</xrd:title>
+                <xrd:notes>This service can be used to exchange username and password for a JWT.</xrd:notes>
+            </wsdl:documentation>
+            <wsdl:input message="tns:authenticate"/>
+            <wsdl:output message="tns:authenticateResponse"/>
+        </wsdl:operation>
     </wsdl:portType>
 
     <wsdl:binding name="testServiceBinding" type="tns:testServicePortType">
@@ -125,6 +181,8 @@
                 <soap:header message="tns:requestheader" part="id" use="literal"/>
                 <soap:header message="tns:requestheader" part="issue" use="literal"/>
                 <soap:header message="tns:requestheader" part="protocolVersion" use="literal"/>
+                <soap:header message="tns:requestheader" part="representedParty" use="literal"/>
+                <soap:header message="tns:requestheader" part="securityToken" use="literal"/>
             </wsdl:input>
             <wsdl:output>
                 <soap:body parts="body" use="literal"/>
@@ -134,6 +192,7 @@
                 <soap:header message="tns:requestheader" part="id" use="literal"/>
                 <soap:header message="tns:requestheader" part="issue" use="literal"/>
                 <soap:header message="tns:requestheader" part="protocolVersion" use="literal"/>
+                <soap:header message="tns:requestheader" part="representedParty" use="literal"/>
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="helloService">
@@ -147,6 +206,8 @@
                 <soap:header message="tns:requestheader" part="id" use="literal"/>
                 <soap:header message="tns:requestheader" part="issue" use="literal"/>
                 <soap:header message="tns:requestheader" part="protocolVersion" use="literal"/>
+                <soap:header message="tns:requestheader" part="representedParty" use="literal"/>
+                <soap:header message="tns:requestheader" part="securityToken" use="literal"/>
             </wsdl:input>
             <wsdl:output>
                 <soap:body parts="body" use="literal"/>
@@ -156,6 +217,32 @@
                 <soap:header message="tns:requestheader" part="id" use="literal"/>
                 <soap:header message="tns:requestheader" part="issue" use="literal"/>
                 <soap:header message="tns:requestheader" part="protocolVersion" use="literal"/>
+                <soap:header message="tns:requestheader" part="representedParty" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="authenticate">
+            <soap:operation soapAction="" style="document" />
+            <xrd:version>v1</xrd:version>
+            <wsdl:input>
+                <soap:body parts="body" use="literal"/>
+                <soap:header message="tns:requestheader" part="client" use="literal"/>
+                <soap:header message="tns:requestheader" part="service" use="literal"/>
+                <soap:header message="tns:requestheader" part="userId" use="literal"/>
+                <soap:header message="tns:requestheader" part="id" use="literal"/>
+                <soap:header message="tns:requestheader" part="issue" use="literal"/>
+                <soap:header message="tns:requestheader" part="protocolVersion" use="literal"/>
+                <soap:header message="tns:requestheader" part="representedParty" use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body parts="body" use="literal"/>
+                <soap:header message="tns:requestheader" part="client" use="literal"/>
+                <soap:header message="tns:requestheader" part="service" use="literal"/>
+                <soap:header message="tns:requestheader" part="userId" use="literal"/>
+                <soap:header message="tns:requestheader" part="id" use="literal"/>
+                <soap:header message="tns:requestheader" part="issue" use="literal"/>
+                <soap:header message="tns:requestheader" part="protocolVersion" use="literal"/>
+                <soap:header message="tns:requestheader" part="representedParty" use="literal"/>
+                <soap:header message="tns:requestheader" part="securityToken" use="literal"/>
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>

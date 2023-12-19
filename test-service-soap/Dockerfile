@@ -1,5 +1,5 @@
 # Base java:11
-FROM eclipse-temurin:11-jre
+FROM amazoncorretto:11-alpine
 
 WORKDIR /app
 

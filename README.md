@@ -2,122 +2,120 @@
 
 A test service to demonstrate X-Road multitenancy with REST services.
 
+## Overview
+The services are intended to provide a reference implementation of the Suomi.fi Palveluväylä multi-tenancy 
+features documented in [Suomi.fi Palveluhallinta](https://palveluhallinta.suomi.fi/fi/tuki/artikkelit/63f8ab85e0763400245f2c8f).
+
+This repository contains three services that demonstrate how multiple organisations 
+can share a single X-Road subsystem and security server:
+ * test-client: a client software that relays messages from external consumer organisations to X-Road services
+ * test-service: a REST service that can be called by X-Road clients
+ * test-service-soap: a SOAP service that can be called by X-Road clients
+
+The services in this repository are not production ready, but are intended as a starting point for developing
+multi-tenant X-Road services. Especially user management features and secret handling are implemented only as mocks.
+
+
 ## Dependencies
  * Java 17 for test-client and test-service
  * Java 11 for test-service-soap
+ * jenv or similar to manage multiple Java versions
  * Maven
- * Docker for local development
+ * Docker
 
-## Local development with standalone security server
+## Running locally with docker compose
 
-Build the application JAR file and start the app and security server in docker compose:
+### Create certificates and trust stores
+
+Setting up this application requires that some certificates are created and added to trust stores.
+Detailed explanation of the required certificates is included later in this document.
+For a quick-start, you can create required certificates and trust stores by running the script:
 ```shell
+./create-keystores.sh
+```
+
+### Build and run the containers using docker compose
+
+Then build the application JAR files and start the services in docker compose:
+```shell
+cd test-client
+jenv local 17.0
 mvn clean package
-cd local-dev
-docker-compose build
-docker-compose up
+
+cd ../test-service
+jenv local 17.0
+mvn clean package
+
+cd ../test-service-soap
+jenv local 11.0
+mvn clean package
+
+cd ..
+docker compose build
+docker compose up -d
 ```
 
 It takes a while for the security server to start up. You can check the logs with `docker compose logs -f ss`.
 
+### Register test-service to the security server
 Login to the security server UI by opening http://localhost:4000 in your browser. 
 The username is `xrd` and the password is `secret`.
 
-Standalone security server has one X-Road service and one client, 
+Standalone security server comes predefined with an X-Road service and a client, 
 named `CS:ORG:1111:TestService` and `CS:ORG:1111:TestClient` respectively.
-Add the rest-test-service to the service list of `CS:ORG:1111:TestService` as a REST service.
-Service base URL in docker network is `http://test-service:8080`. When adding the service you can provide the service's
-OpenApi description URL: `http://test-service:8080/rest-api/api-docs`. Security server will then automatically add all 
-the service endpoints when creating the X-Road service. Set the service-code to `rest-test` and remember to enable the 
-service.
+Add the test-service to the service list of `CS:ORG:1111:TestService` as a REST service.
+by providing the service's OpenApi description URL: `https://test-service:8443/rest-api/api-docs`. 
+Security server will then automatically add all the service endpoints when creating the X-Road service. 
+Set the service-code to `rest-test` and remember to enable the service.
 
-In `CS:ORG:1111:TestService` service client settings, add a perimission for subject `CS:ORG:1111:TestClient` 
+In `CS:ORG:1111:TestService`'s service client settings, add a perimission for subject `CS:ORG:1111:TestClient` 
 to make calls to the service code `rest-test`.
-For detailed example of standalone security server configuration, refer to 
+
+Next add the test-service certificate to the security server's trust list. Open the tab 'Internal Servers' and in 
+section 'Information System TLS certificate' click the 'Add' button. Select the file `test-service/keys/test-service-cert.pem` that
+was created by the `create-certs.sh` script above.
+
+### Register test-service-soap to the security server
+Add the test-service-soap to the service list of `CS:ORG:1111:TestService` as a SOAP service by providing the
+service's WSDL URL: `https://test-service-soap:8443/example-adapter/Endpoint?wsdl`.
+
+This should add new services with service code `authenticate`, `getRandom` and `helloService` to the service list.
+Enable all the new services and add permissions for `CS:ORG:1111:TestClient` to call them.
+
+Then add the test-service-soap certificate to the security server's trust list as described above. 
+The certificate file to add is `test-service-soap/keys/test-service-soap-cert.pem`.
+
+For more info about and examples of standalone security server configuration, refer to 
 [the tutorial](https://github.com/digitaliceland/Straumurinn/blob/master/DOC/Manuals/standalone_security_server_tutorial.md).
 
-To call the service with curl, first send a login command:
-```shell
-curl -v \
-  -X GET \
-  -H 'X-Road-Client: CS/ORG/1111/TestClient' \
-  -H "X-Road-Represented-Party: Foo/BAR" \
-  -H "Member-Username: Foo/BAR" \
-  -H "Member-Password: password" \
-  -i 'http://localhost:8080/r1/CS/ORG/1111/TestService/multitenancy-test/login'
-```
-
-In the response headers you get the JWT token that can be used to authenticate when calling the private endpoints:
-```shell
-curl -v \
-  -X GET \
-  -H 'X-Road-Client: CS/ORG/1111/TestClient' \
-  -H "Authorization: Bearer <your-token-here>" \
-  -i 'http://localhost:8080/r1/CS/ORG/1111/TestService/multitenancy-test/private/greeting'
-  
-```
-
-## Generating keys and certificates
-### test-service and test-service-soap
-Need key-pairs to create JWTs.
-
-
-### test-client
-Needs a certificate for SSL
-
-### mocking external consumer organisations
-To mock external consumers, you need to create certificates for them.
-`external-consumer` directory contains a script to generate certificates 
-for two mock organisations, `org1`and `org2`:
-```shell
-cd external-consumer
-./generate-certs.sh
-```
-
-
-## Adding certificates to trust stores
-### test-service
-
-### test-client
-Add the certs of external consumer organisations org1 and org2 to the client's trust store.
-Cert of org3 is not added to allow testing that calls from untrusted consumer will fail.
-
-```
-keytool \
-    -import \
-    -file external-consumer/org1/certs/cert.pem \
-    -alias org1 \
-    -keystore test-client/keys/truststore.p12 \
-    -storepass changeit \
-    -storeType PKCS12 \
-    -noprompt
-
-keytool \
-    -import \
-    -file external-consumer/org2/certs/cert.pem \
-    -alias org2 \
-    -keystore test-client/keys/truststore.p12 \
-    -storepass changeit \
-    -storeType PKCS12 \
-    -noprompt
-```
-
-### mocking external consumer organisations
-Externals consumers need to trust the test-clients certificate.
-To export the test-client certificate from test-client keystore in pem format, run:
-```shell
-cd external-consumer
-./export-test-client-cert.sh
-```
-
-The `test-request.sh` script then uses the exported certificate to trust the test-client 
-when making calls as a mock organisation.
+### Try it out
+The folder ``external-consumer`` contains a script to make calls to the test-service as a mock organisation.
+There are three mock organisations, `org1`, `org2` and `org3`, and the `create-certs.sh` script 
+created certificates for them. The certificates of org1 and org2 are added to the test-client's trust store.
+Certificate of org3 is not trusted and can be used to test that calls from untrusted consumer will fail.
 
 When testing locally you must add the following line to `/etc/hosts` to match the test-clients certificate CN:
 ```
 127.0.0.1 xroad-multitenancy-test-client
 ```
 
+The `test-request.sh` script uses curl to make calls to the test-client using the mock organisations' certificates.
+
+To request a hello-greeting from test-service as `org1`, run:
+```shell
+cd external-consumer
+./test-request.sh org1 hello?name=John
+```
+
+To request a hello-greeting from test-service-soap as `org1`, run:
+```shell
+./test-request.sh org2 hello?name=John&protocol=soap
+```
+
+To test a failing certificate, run:
+```shell
+./test-request.sh org3 hello?name=John
+```
 
 ## test-client unit test keystores
 

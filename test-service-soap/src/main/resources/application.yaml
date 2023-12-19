@@ -1,0 +1,22 @@
+server.servlet.context-path: /example-adapter
+server.port: 8080
+spring.mvc.view.prefix: /WEB-INF/jsp/
+spring.mvc.view.suffix: .jsp
+
+jwt-keystore-file: keys/keystore.p12
+
+---
+spring:
+  config:
+    activate:
+      on-profile: use_tls
+
+server:
+  port: 8443
+  ssl:
+    key-store-type: "PKCS12"
+    key-store: "file:test-service-soap/keys/keystore.p12"
+    key-store-password: "changeit"
+    key-alias: "xroad-multitenancy-test-service-soap-tls-certificate"
+    key-password: "changeit"
+    client-auth: none

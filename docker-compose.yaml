@@ -1,0 +1,37 @@
+services:
+  ss:
+    image: niis/xroad-security-server-standalone:latest
+    hostname: ss
+    ports:
+      - 4000:4000
+      - 8080:8080
+
+  test-service:
+    build:
+      context: ./test-service
+      dockerfile: ./Dockerfile
+    volumes:
+      - ${PWD}/test-service/keys/keystore.p12:/app/keys/keystore.p12:ro
+      - ${PWD}/test-service/keys/keystore.p12:/app/test-service/keys/keystore.p12:ro
+    environment:
+        - SPRING_PROFILES_ACTIVE=default,use_tls
+
+  test-service-soap:
+    build:
+      context: ./test-service-soap
+      dockerfile: ./Dockerfile
+    volumes:
+      - ${PWD}/test-service-soap/keys/keystore.p12:/app/keys/keystore.p12:ro
+      - ${PWD}/test-service-soap/keys/keystore.p12:/app/test-service-soap/keys/keystore.p12:ro
+    environment:
+      - SPRING_PROFILES_ACTIVE=default,use_tls
+
+  test-client:
+    build:
+      context: ./test-client
+      dockerfile: ./Dockerfile
+    volumes:
+      - ${PWD}/test-client/keys/keystore.p12:/app/test-client/keys/keystore.p12:ro
+      - ${PWD}/test-client/keys/truststore.p12:/app/test-client/keys/truststore.p12:ro
+    ports:
+      - 8443:8443

@@ -31,6 +31,7 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -47,15 +48,18 @@ import java.util.Date;
 @Service
 public class JwtService {
 
+    @Value("${jwt-keystore-file}")
+    private String keystoreFile;
+
     private RSAKey key;
 
     public JwtService() throws JOSEException, KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
         char[] password = "changeit".toCharArray();
 
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
-        File file = new File("keys/keys.p12");
+        File file = new File(keystoreFile);
         keyStore.load(new FileInputStream(file), password);
-        key = RSAKey.load(keyStore, "xroad-multi-tenancy-test", password);
+        key = RSAKey.load(keyStore, "jwt-key", password);
     }
 
     public String generateJwt(String subject, Date expirationTime) throws JOSEException {

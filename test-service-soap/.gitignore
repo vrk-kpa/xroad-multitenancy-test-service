@@ -38,4 +38,4 @@ build/
 .java-version
 
 
-keys/
+keys/*.p12

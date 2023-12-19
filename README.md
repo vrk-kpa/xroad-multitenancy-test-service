@@ -60,48 +60,10 @@ curl -v \
 ## Generating keys and certificates
 ### test-service and test-service-soap
 Need key-pairs to create JWTs.
-```shell
-keytool -genkeypair \
-    -alias xroad-multi-tenancy-test \
-    -keyalg RSA \
-    -keysize 4096 \
-    -validity 3650 \
-    -dname "CN=xroad-multitenancy-test-service,OU=suomi-fi-palveluvayla,O=DVV,L=,S=CA,C=U" \
-    -keypass changeit \
-    -keystore test-service/keys/keys.p12 \
-    -storeType PKCS12 \
-    -storepass changeit
-```
-
-```shell
-keytool -genkeypair \
-    -alias xroad-multi-tenancy-test \
-    -keyalg RSA \
-    -keysize 4096 \
-    -validity 3650 \
-    -dname "CN=xroad-multitenancy-test-service-soap,OU=suomi-fi-palveluvayla,O=DVV,L=,S=CA,C=U" \
-    -keypass changeit \
-    -keystore test-service-soap/keys/keys.p12 \
-    -storeType PKCS12 \
-    -storepass changeit
-```
-
 
 
 ### test-client
-Needs a certificate for SSL:
-```
-keytool -genkeypair \
-    -alias xroad-multitenancy-test-client \
-    -keyalg RSA \
-    -keysize 4096 \
-    -validity 3650 \
-    -dname "CN=xroad-multitenancy-test-client,OU=suomi-fi-palveluvayla,O=DVV,L=,S=CA,C=U" \
-    -keypass changeit \
-    -keystore test-client/keys/keystore.p12 \
-    -storeType PKCS12 \
-    -storepass changeit
-```
+Needs a certificate for SSL
 
 ### mocking external consumer organisations
 To mock external consumers, you need to create certificates for them.

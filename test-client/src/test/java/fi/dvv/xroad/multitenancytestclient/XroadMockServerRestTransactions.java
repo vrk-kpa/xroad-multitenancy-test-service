@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-public class XroadMockServerTransactions {
+public class XroadMockServerRestTransactions {
 
     private final String serviceId;
 
-    public XroadMockServerTransactions(String serviceId) {
+    public XroadMockServerRestTransactions(String serviceId) {
         this.serviceId = serviceId;
     }
 

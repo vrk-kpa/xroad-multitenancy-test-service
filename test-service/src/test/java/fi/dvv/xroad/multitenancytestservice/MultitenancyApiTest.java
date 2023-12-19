@@ -123,6 +123,6 @@ class MultitenancyApiTest {
 
     @Test
     void jwksReturnsPublicKey() throws Exception {
-        assertThat(this.restTemplate.getForObject(baseUrl() + "/jwks", String.class)).contains("\"kid\":\"xroad-multi-tenancy-test\"");
+        assertThat(this.restTemplate.getForObject(baseUrl() + "/jwks", String.class)).contains("\"kid\":\"xroad-multitenancy-test-service-jwt-key\"");
     }
 }

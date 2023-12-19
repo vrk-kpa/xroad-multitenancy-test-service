@@ -47,19 +47,15 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-
-    @Value("${jwt-keystore-file}")
-    private String keystoreFile;
-
     private RSAKey key;
 
     public JwtService() throws JOSEException, KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
         char[] password = "changeit".toCharArray();
 
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
-        File file = new File(keystoreFile);
+        File file = new File("keys/keystore.p12");
         keyStore.load(new FileInputStream(file), password);
-        key = RSAKey.load(keyStore, "jwt-key", password);
+        key = RSAKey.load(keyStore, "xroad-multitenancy-test-service-soap-jwt-key", password);
     }
 
     public String generateJwt(String subject, Date expirationTime) throws JOSEException {

@@ -58,7 +58,7 @@ class JwtServiceTest {
     @Test
     void getJwksPublicKeyReturnsJwks() throws Exception {
         String jwks = jwtService.getJwksPublicKey();
-        assertThat(jwks).contains("\"kid\":\"xroad-multi-tenancy-test\"");
+        assertThat(jwks).contains("\"kid\":\"xroad-multitenancy-test-service-soap-jwt-key\"");
         // assertThat(jwks).contains("\"alg\":\"RS256\"");
         assertThat(jwks).contains("\"kty\":\"RSA\"");
         // assertThat(jwks).contains("\"use\":\"sig\"");

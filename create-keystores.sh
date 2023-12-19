@@ -1,6 +1,6 @@
 # Create keypair for test-service JWT signing
 keytool -genkeypair \
-    -alias jwt-key \
+    -alias xroad-multitenancy-test-service-jwt-key \
     -keyalg RSA \
     -keysize 4096 \
     -validity 365 \
@@ -10,9 +10,9 @@ keytool -genkeypair \
     -storeType PKCS12 \
     -storepass changeit
 
-# To enable TLS from security server to test-service, create a SSL certificate in test-service keystore
+# To enable TLS from security server to test-service, create a TLS certificate in test-service keystore
 keytool -genkeypair \
-    -alias ssl-cerificate \
+    -alias xroad-multitenancy-test-service-tls-certificate \
     -keyalg RSA \
     -keysize 4096 \
     -validity 365 \
@@ -22,9 +22,9 @@ keytool -genkeypair \
     -storeType PKCS12 \
     -storepass changeit
 
-# Export the SSL certificate to pem format so it can be added to security server
+# Export the TLS certificate to pem format so it can be added to security server
 keytool -export \
-    -alias ssl-cerificate \
+    -alias xroad-multitenancy-test-service-tls-certificate \
     -file test-service/keys/test-service-cert.pem \
     -keystore test-service/keys/keystore.p12 \
     -storepass changeit \
@@ -32,7 +32,7 @@ keytool -export \
 
 # Create a keypair for test-service-soap JWT signing
 keytool -genkeypair \
-    -alias jwt-key \
+    -alias xroad-multitenancy-test-service-soap-jwt-key \
     -keyalg RSA \
     -keysize 4096 \
     -validity 365 \
@@ -42,9 +42,9 @@ keytool -genkeypair \
     -storeType PKCS12 \
     -storepass changeit
 
-# To enable TLS from security server to test-service-soap, create a SSL certificate in test-service-soap keystore
+# To enable TLS from security server to test-service-soap, create a TLS certificate in test-service-soap keystore
 keytool -genkeypair \
-    -alias ssl-cerificate \
+    -alias xroad-multitenancy-test-service-soap-tls-certificate \
     -keyalg RSA \
     -keysize 4096 \
     -validity 365 \
@@ -54,9 +54,9 @@ keytool -genkeypair \
     -storeType PKCS12 \
     -storepass changeit
 
-# Export the SSL certificate to pem format so it can be added to security server
+# Export the TLS certificate to pem format so it can be added to security server
 keytool -export \
-    -alias ssl-cerificate \
+    -alias xroad-multitenancy-test-service-soap-tls-certificate \
     -file test-service-soap/keys/test-service-soap-cert.pem \
     -keystore test-service-soap/keys/keystore.p12 \
     -storepass changeit \

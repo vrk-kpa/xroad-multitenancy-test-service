@@ -67,7 +67,7 @@ keytool -genkeypair \
     -alias xroad-multitenancy-test-client \
     -keyalg RSA \
     -keysize 4096 \
-    -validity 3650 \
+    -validity 365 \
     -dname "CN=xroad-multitenancy-test-client,OU=suomi-fi-palveluvayla,O=DVV,L=,S=CA,C=U" \
     -keypass changeit \
     -keystore test-client/keys/keystore.p12 \

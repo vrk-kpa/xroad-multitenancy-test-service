@@ -1,4 +1,4 @@
-package fi.dvv.xroad.multitenancytestclient.model.soaprequest;
+package soap.request;
 
 public class AuthenticateRequest extends XroadSoapRequest {
     private final String password;

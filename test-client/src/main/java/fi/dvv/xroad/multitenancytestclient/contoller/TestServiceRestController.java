@@ -3,7 +3,7 @@ package fi.dvv.xroad.multitenancytestclient.contoller;
 import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
-import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionService;
+import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceRest;
 
 import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceSoap;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class TestServiceRestController {
-    final private XroadConnectionService xroadConnectionService;
+    final private XroadConnectionServiceRest xroadConnectionServiceRest;
     final private XroadConnectionServiceSoap xroadConnectionServiceSoap;
 
-    public TestServiceRestController(XroadConnectionService xroadConnectionService, XroadConnectionServiceSoap xroadConnectionServiceSoap) {
-        this.xroadConnectionService = xroadConnectionService;
+    public TestServiceRestController(XroadConnectionServiceRest xroadConnectionServiceRest, XroadConnectionServiceSoap xroadConnectionServiceSoap) {
+        this.xroadConnectionServiceRest = xroadConnectionServiceRest;
         this.xroadConnectionServiceSoap = xroadConnectionServiceSoap;
     }
 
@@ -31,7 +31,7 @@ public class TestServiceRestController {
             return xroadConnectionServiceSoap.makeGetRandomRequest(principal);
         }
 
-        return xroadConnectionService.getRandom(principal);
+        return xroadConnectionServiceRest.getRandom(principal);
     }
 
     @GetMapping("/hello")
@@ -44,6 +44,6 @@ public class TestServiceRestController {
         if(protocol != null && protocol.equals("soap")) {
             return xroadConnectionServiceSoap.makeHelloServiceRequest(principal, name);
         }
-        return xroadConnectionService.getHello(principal, name);
+        return xroadConnectionServiceRest.getHello(principal, name);
     }
 }

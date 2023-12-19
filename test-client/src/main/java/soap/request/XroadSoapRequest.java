@@ -1,4 +1,4 @@
-package fi.dvv.xroad.multitenancytestclient.model.soaprequest;
+package soap.request;
 
 
 public abstract class XroadSoapRequest {

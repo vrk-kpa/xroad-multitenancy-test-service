@@ -3,7 +3,7 @@ package fi.dvv.xroad.multitenancytestclient;
 import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
-import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionService;
+import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceRest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,10 +20,10 @@ import static org.mockserver.matchers.Times.exactly;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class TestXroadConnectionService {
+public class TestXroadConnectionServiceRest {
 
     @Autowired
-    XroadConnectionService service;
+    XroadConnectionServiceRest service;
 
     private ClientAndServer mockServer;
 

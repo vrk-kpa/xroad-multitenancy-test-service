@@ -13,7 +13,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class XroadConnectionService {
+public class XroadConnectionServiceRest {
 
     // Used to store this connection's token in the principal's token map
     public static final String TOKEN_ID = "multitenancy-test-service-rest";

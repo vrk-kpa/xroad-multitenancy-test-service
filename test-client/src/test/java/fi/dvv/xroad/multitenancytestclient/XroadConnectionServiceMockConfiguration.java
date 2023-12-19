@@ -1,6 +1,6 @@
 package fi.dvv.xroad.multitenancytestclient;
 
-import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionService;
+import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceRest;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Profile;
 public class XroadConnectionServiceMockConfiguration {
     @Bean
     @Primary
-    public XroadConnectionService xroadConnectionService() {
-        return Mockito.mock(XroadConnectionService.class);
+    public XroadConnectionServiceRest xroadConnectionService() {
+        return Mockito.mock(XroadConnectionServiceRest.class);
     }
 }

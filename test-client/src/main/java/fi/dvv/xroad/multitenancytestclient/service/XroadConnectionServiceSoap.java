@@ -3,18 +3,17 @@ package fi.dvv.xroad.multitenancytestclient.service;
 import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
-import fi.dvv.xroad.multitenancytestclient.model.soaprequest.AuthenticateRequest;
-import fi.dvv.xroad.multitenancytestclient.model.soaprequest.GetRandomRequest;
-import fi.dvv.xroad.multitenancytestclient.model.soaprequest.HelloServiceRequest;
-import fi.dvv.xroad.multitenancytestclient.model.soaprequest.XroadSoapRequest;
+import soap.request.AuthenticateRequest;
+import soap.request.GetRandomRequest;
+import soap.request.HelloServiceRequest;
+import soap.request.XroadSoapRequest;
+import soap.response.XroadSoapResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -44,8 +43,8 @@ public class XroadConnectionServiceSoap {
                 principal.getToken(TOKEN_ID),
                 name
         );
-        String response = makeSoapRequestWithLoginRetry(securityServerUrl, request, principal);
-        return new MessageDto(extractHelloMessageFromResponse(response));
+        XroadSoapResponse response = makeSoapRequestWithLoginRetry(securityServerUrl, request, principal);
+        return new MessageDto(response.getHelloMessage());
     }
 
     public RandomNumberDto makeGetRandomRequest(ConsumerServiceUser principal) {
@@ -57,11 +56,11 @@ public class XroadConnectionServiceSoap {
                 principal.getXroadMemberCode(),
                 principal.getToken(TOKEN_ID)
         );
-        String response = makeSoapRequestWithLoginRetry(securityServerUrl, request, principal);
-        return new RandomNumberDto(extractRandomNumberFromResponse(response));
+        XroadSoapResponse response = makeSoapRequestWithLoginRetry(securityServerUrl, request, principal);
+        return new RandomNumberDto(response.getRandomNumber());
     }
 
-    private String makeSoapRequestWithLoginRetry(
+    private XroadSoapResponse makeSoapRequestWithLoginRetry(
             String uri,
             XroadSoapRequest request,
             ConsumerServiceUser principal
@@ -77,19 +76,29 @@ public class XroadConnectionServiceSoap {
         headers.setContentType(MediaType.TEXT_XML);
 
         try {
-            HttpEntity<String> httpEntity = new HttpEntity<>(request.toString(), headers);
-            return restTemplate.exchange(uri, HttpMethod.POST, httpEntity, String.class).getBody();
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+            return makeSoapRequest(uri, request, headers);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Access denied")) {
                 principal.setToken(TOKEN_ID,null);
                 loginPrincipal(principal);
                 request.setJwt(principal.getToken(TOKEN_ID));
-                HttpEntity<String> httpEntity = new HttpEntity<>(request.toString(), headers);
-                return restTemplate.exchange(uri, HttpMethod.POST, httpEntity, String.class).getBody();
+
+                return makeSoapRequest(uri, request, headers);
+
             } else {
                 throw e;
             }
         }
+    }
+
+    private XroadSoapResponse makeSoapRequest(String uri, XroadSoapRequest request, HttpHeaders headers) {
+        HttpEntity<String> httpEntity = new HttpEntity<>(request.toString(), headers);
+        String rawResponse = restTemplate.exchange(uri, HttpMethod.POST, httpEntity, String.class).getBody();
+        XroadSoapResponse parsedResponse = new XroadSoapResponse(rawResponse);
+        String fault = parsedResponse.getFault();
+        if(fault != null)
+            throw new RuntimeException("Received SOAP fault response: " + fault);
+        return parsedResponse;
     }
 
     private void loginPrincipal(ConsumerServiceUser principal) {
@@ -110,30 +119,13 @@ public class XroadConnectionServiceSoap {
         HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);
 
         String response = restTemplate.exchange(securityServerUrl, HttpMethod.POST, entity, String.class).getBody();
-        String jwt = extractJwtFromResponse(response);
+        XroadSoapResponse parsedResponse = new XroadSoapResponse(response);
+        String fault = parsedResponse.getFault();
+        if(fault != null)
+            throw new RuntimeException("Failed to authenticate: " + fault);
+
+        String jwt = parsedResponse.getSecurityToken();
         System.out.println("Got JWT: " + jwt);
         principal.setToken(TOKEN_ID, jwt);
-    }
-
-    private String extractJwtFromResponse(String response){
-        System.out.println("Got response: " + response);
-        // Should do this with a real XML parser but here we go...
-        String[] parts = response.split("<extsec:securityToken xmlns:extsec=\"http://x-road.eu/xsd/security-token.xsd\" tokenType=\"urn:ietf:params:oauth:token-type:jwt\">", 2);
-        String[] parts2 = parts[1].split("</extsec:securityToken>", 2);
-        return parts2[0];
-    }
-
-    private int extractRandomNumberFromResponse(String response){
-        System.out.println("Got response: " + response);
-        String[] parts = response.split("<ts1:data>", 2);
-        String[] parts2 = parts[1].split("</ts1:data>", 2);
-        return Integer.parseInt(parts2[0]);
-    }
-
-    private String extractHelloMessageFromResponse(String response){
-        System.out.println("Got response: " + response);
-        String[] parts = response.split("<ts1:message>", 2);
-        String[] parts2 = parts[1].split("</ts1:message>", 2);
-        return parts2[0];
     }
 }

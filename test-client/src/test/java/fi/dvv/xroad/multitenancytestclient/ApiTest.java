@@ -2,7 +2,7 @@ package fi.dvv.xroad.multitenancytestclient;
 
 import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
-import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionService;
+import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceRest;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -38,7 +38,7 @@ class ApiTest {
     private RestTemplate restTemplate;
 
     @Autowired
-    private XroadConnectionService xroadConnectionService;
+    private XroadConnectionServiceRest xroadConnectionServiceRest;
 
     @Captor
     ArgumentCaptor<ConsumerServiceUser> principalCaptor;
@@ -50,7 +50,7 @@ class ApiTest {
         this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class);
 
         Mockito.verify(
-                xroadConnectionService,
+                xroadConnectionServiceRest,
                 Mockito.times(1)
         ).getRandom(principalCaptor.capture());
 
@@ -59,7 +59,7 @@ class ApiTest {
         assertThat(principal.getXroadMemberCode()).isEqualTo("11111-1");
         assertThat(principal.getUsername()).isEqualTo("org1.com");
         assertThat(principal.getPasswordFromSecretsManager()).isEqualTo("password");
-        assertThat(principal.getToken(xroadConnectionService.TOKEN_ID)).isNull();
+        assertThat(principal.getToken(xroadConnectionServiceRest.TOKEN_ID)).isNull();
     }
 
     @Test
@@ -69,7 +69,7 @@ class ApiTest {
         this.restTemplate.getForObject(baseUrl() + "/hello", RandomNumberDto.class);
 
         Mockito.verify(
-                xroadConnectionService,
+                xroadConnectionServiceRest,
                 Mockito.times(1)
         ).getHello(principalCaptor.capture(), Mockito.any());
 
@@ -78,6 +78,6 @@ class ApiTest {
         assertThat(principal.getXroadMemberCode()).isEqualTo("11111-1");
         assertThat(principal.getUsername()).isEqualTo("org1.com");
         assertThat(principal.getPasswordFromSecretsManager()).isEqualTo("password");
-        assertThat(principal.getToken(xroadConnectionService.TOKEN_ID)).isNull();
+        assertThat(principal.getToken(xroadConnectionServiceRest.TOKEN_ID)).isNull();
     }
 }

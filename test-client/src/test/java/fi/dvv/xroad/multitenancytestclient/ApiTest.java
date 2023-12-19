@@ -59,7 +59,7 @@ class ApiTest {
         assertThat(principal.getXroadMemberCode()).isEqualTo("11111-1");
         assertThat(principal.getUsername()).isEqualTo("org1.com");
         assertThat(principal.getPasswordFromSecretsManager()).isEqualTo("password");
-        assertThat(principal.getToken()).isNull();
+        assertThat(principal.getToken(xroadConnectionService.TOKEN_ID)).isNull();
     }
 
     @Test
@@ -78,6 +78,6 @@ class ApiTest {
         assertThat(principal.getXroadMemberCode()).isEqualTo("11111-1");
         assertThat(principal.getUsername()).isEqualTo("org1.com");
         assertThat(principal.getPasswordFromSecretsManager()).isEqualTo("password");
-        assertThat(principal.getToken()).isNull();
+        assertThat(principal.getToken(xroadConnectionService.TOKEN_ID)).isNull();
     }
 }

@@ -46,7 +46,7 @@ public class TestXroadConnectionService {
     @Test
     public void callingGetRandomWithTokenReturnsRandomNumber() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
-        principal.setToken("Bearer foo");
+        principal.setToken(service.TOKEN_ID, "Bearer foo");
 
         HttpRequest randomRequest = transactions.getRandomRequest();
         mockServer.when(randomRequest, exactly(1)).respond(transactions.getRandomResponse());
@@ -79,7 +79,7 @@ public class TestXroadConnectionService {
     @Test
     public void callingGetRandomWithInvalidTokenTriggersLogin() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
-        principal.setToken("Bearer bar");
+        principal.setToken(service.TOKEN_ID, "Bearer bar");
 
         HttpRequest failingRandomRequest = transactions.getRandomWithInvalidTokenRequest();
         mockServer.when(failingRandomRequest, exactly(1)).respond(transactions.getUnauthorizedResponse());
@@ -104,7 +104,7 @@ public class TestXroadConnectionService {
     @Test
     public void callingGetHelloWithTokenReturnsGreeting() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
-        principal.setToken("Bearer foo");
+        principal.setToken(service.TOKEN_ID, "Bearer foo");
 
         HttpRequest helloRequest = transactions.getHelloRequest();
         mockServer.when(helloRequest, exactly(1)).respond(transactions.getHelloResponse());
@@ -136,7 +136,7 @@ public class TestXroadConnectionService {
     @Test
     public void callingGetHelloWithInvalidTokenTriggersLogin() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
-        principal.setToken("Bearer bar");
+        principal.setToken(service.TOKEN_ID, "Bearer bar");
 
         HttpRequest failingHelloRequest = transactions.getHelloWithInvalidTokenRequest();
         mockServer.when(failingHelloRequest, exactly(1)).respond(transactions.getUnauthorizedResponse());

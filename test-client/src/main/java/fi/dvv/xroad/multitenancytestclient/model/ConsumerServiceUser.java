@@ -3,17 +3,17 @@ package fi.dvv.xroad.multitenancytestclient.model;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.Collections;
+import java.util.HashMap;
 
 public class ConsumerServiceUser extends User {
 
     private final String xroadMemberClass;
     private final String xroadMemberCode;
-    private String token;
+    private HashMap<String, String> tokens = new HashMap<>();
     private final String passwordInSecretsManager;
 
     public ConsumerServiceUser(String username, String password, String xroadMemberClass, String xroadMemberCode) {
         super(username, password, Collections.emptySet());
-        this.token = null;
         this.xroadMemberClass = xroadMemberClass;
         this.xroadMemberCode = xroadMemberCode;
         this.passwordInSecretsManager = password;
@@ -27,16 +27,16 @@ public class ConsumerServiceUser extends User {
         return xroadMemberCode;
     }
 
-    public String getToken() {
-        return token;
+    public String getToken(String tokenId) {
+        return tokens.get(tokenId);
     }
 
     public String getPasswordFromSecretsManager() {
         return passwordInSecretsManager;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setToken(String tokenId, String token) {
+        this.tokens.put(tokenId, token);
     }
 
 }

@@ -15,6 +15,9 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class XroadConnectionService {
 
+    // Used to store this connection's token in the principal's token map
+    public static final String TOKEN_ID = "multitenancy-test-service-rest";
+
     @Value("${security-server.client-id}")
     private String clientId;
 
@@ -50,7 +53,7 @@ public class XroadConnectionService {
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 // The token was invalid, so trigger new login by clearing the principal's token
-                principal.setToken(null);
+                principal.setToken(TOKEN_ID,null);
                 HttpEntity<T> httpEntity = getXroadHttpEntity(principal);
                 return restTemplate.exchange(uri, HttpMethod.GET, httpEntity, responseType).getBody();
             } else {
@@ -77,18 +80,18 @@ public class XroadConnectionService {
         RestTemplate restTemplate = new RestTemplate();
         String jwt = restTemplate.exchange(uri, HttpMethod.GET, entity, MessageDto.class).getHeaders().get("Authorization").get(0);
         System.out.println("Got JWT: " + jwt);
-        principal.setToken(jwt);
+        principal.setToken(TOKEN_ID, jwt);
     }
 
     private <T> HttpEntity<T> getXroadHttpEntity(ConsumerServiceUser principal) {
-        if(principal.getToken() == null){
+        if(principal.getToken(TOKEN_ID) == null){
             loginPrincipal(principal);
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Road-Client", clientId);
         headers.set("X-Road-Represented-Party", principal.getXroadMemberClass() + "/" + principal.getXroadMemberCode());
-        headers.set("Authorization", principal.getToken());
+        headers.set("Authorization", principal.getToken(TOKEN_ID));
         return new HttpEntity<>(headers);
     }
 }

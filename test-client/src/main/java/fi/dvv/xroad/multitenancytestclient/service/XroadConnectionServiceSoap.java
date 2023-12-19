@@ -20,6 +20,9 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class XroadConnectionServiceSoap {
 
+    // Used to store this connection's token in the principal's token map
+    public static final String TOKEN_ID = "multitenancy-test-service-soap";
+
     @Value("${security-server.client-id}")
     private String clientId;
 
@@ -38,7 +41,7 @@ public class XroadConnectionServiceSoap {
                 serviceId,
                 principal.getXroadMemberClass(),
                 principal.getXroadMemberCode(),
-                principal.getToken(),
+                principal.getToken(TOKEN_ID),
                 name
         );
         String response = makeSoapRequestWithLoginRetry(securityServerUrl, request, principal);
@@ -52,7 +55,7 @@ public class XroadConnectionServiceSoap {
                 serviceId,
                 principal.getXroadMemberClass(),
                 principal.getXroadMemberCode(),
-                principal.getToken()
+                principal.getToken(TOKEN_ID)
         );
         String response = makeSoapRequestWithLoginRetry(securityServerUrl, request, principal);
         return new RandomNumberDto(extractRandomNumberFromResponse(response));
@@ -64,10 +67,10 @@ public class XroadConnectionServiceSoap {
             ConsumerServiceUser principal
     ) {
 
-        if(principal.getToken() == null || request.getJwt() == null){
-            principal.setToken(null);
+        if(principal.getToken(TOKEN_ID) == null || request.getJwt() == null){
+            principal.setToken(TOKEN_ID,null);
             loginPrincipal(principal);
-            request.setJwt(principal.getToken());
+            request.setJwt(principal.getToken(TOKEN_ID));
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -78,9 +81,9 @@ public class XroadConnectionServiceSoap {
             return restTemplate.exchange(uri, HttpMethod.POST, httpEntity, String.class).getBody();
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                principal.setToken(null);
+                principal.setToken(TOKEN_ID,null);
                 loginPrincipal(principal);
-                request.setJwt(principal.getToken());
+                request.setJwt(principal.getToken(TOKEN_ID));
                 HttpEntity<String> httpEntity = new HttpEntity<>(request.toString(), headers);
                 return restTemplate.exchange(uri, HttpMethod.POST, httpEntity, String.class).getBody();
             } else {
@@ -109,7 +112,7 @@ public class XroadConnectionServiceSoap {
         String response = restTemplate.exchange(securityServerUrl, HttpMethod.POST, entity, String.class).getBody();
         String jwt = extractJwtFromResponse(response);
         System.out.println("Got JWT: " + jwt);
-        principal.setToken(jwt);
+        principal.setToken(TOKEN_ID, jwt);
     }
 
     private String extractJwtFromResponse(String response){

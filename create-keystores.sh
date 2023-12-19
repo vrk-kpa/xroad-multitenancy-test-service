@@ -75,7 +75,7 @@ keytool -genkeypair \
     -storepass changeit
 
 # Create certificates for external consumer organization mocks
-(cd external-consumer && ./generate-certs.sh)
+(cd external-consumer && ./create-certs.sh)
 
 
 # Import consumer organisation certificates to test-client trust-store

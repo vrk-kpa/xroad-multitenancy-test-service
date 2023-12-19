@@ -1,7 +1,6 @@
 package fi.dvv.xroad.multitenancytestclient.soap.response;
 
 import org.junit.jupiter.api.Test;
-import soap.response.XroadSoapResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

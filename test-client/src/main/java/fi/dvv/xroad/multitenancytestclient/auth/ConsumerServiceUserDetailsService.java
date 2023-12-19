@@ -1,6 +1,5 @@
 package fi.dvv.xroad.multitenancytestclient.auth;
 
-import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package fi.dvv.xroad.multitenancytestclient.service;
 
-import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
+import fi.dvv.xroad.multitenancytestclient.auth.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
 import org.springframework.beans.factory.annotation.Value;

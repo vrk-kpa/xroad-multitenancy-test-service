@@ -1,6 +1,6 @@
 package fi.dvv.xroad.multitenancytestclient;
 
-import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
+import fi.dvv.xroad.multitenancytestclient.auth.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
 import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceRest;
 import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceSoap;

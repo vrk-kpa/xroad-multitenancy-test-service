@@ -1,13 +1,13 @@
 package fi.dvv.xroad.multitenancytestclient.service;
 
-import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
+import fi.dvv.xroad.multitenancytestclient.auth.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
-import soap.request.AuthenticateRequest;
-import soap.request.GetRandomRequest;
-import soap.request.HelloServiceRequest;
-import soap.request.XroadSoapRequest;
-import soap.response.XroadSoapResponse;
+import fi.dvv.xroad.multitenancytestclient.soap.request.AuthenticateRequest;
+import fi.dvv.xroad.multitenancytestclient.soap.request.GetRandomRequest;
+import fi.dvv.xroad.multitenancytestclient.soap.request.HelloServiceRequest;
+import fi.dvv.xroad.multitenancytestclient.soap.request.XroadSoapRequest;
+import fi.dvv.xroad.multitenancytestclient.soap.response.XroadSoapResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

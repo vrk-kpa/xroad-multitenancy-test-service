@@ -1,4 +1,4 @@
-package fi.dvv.xroad.multitenancytestclient.model;
+package fi.dvv.xroad.multitenancytestclient.auth;
 
 import org.springframework.security.core.userdetails.User;
 

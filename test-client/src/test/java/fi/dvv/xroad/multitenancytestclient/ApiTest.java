@@ -3,6 +3,7 @@ package fi.dvv.xroad.multitenancytestclient;
 import fi.dvv.xroad.multitenancytestclient.model.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
 import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceRest;
+import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceSoap;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -40,11 +41,14 @@ class ApiTest {
     @Autowired
     private XroadConnectionServiceRest xroadConnectionServiceRest;
 
+    @Autowired
+    private XroadConnectionServiceSoap xroadConnectionServiceSoap;
+
     @Captor
     ArgumentCaptor<ConsumerServiceUser> principalCaptor;
 
     @Test
-    void getRandomCallsXroad() {
+    void getRandomCallsXroadRest() {
         assertThat(contextPath).isEqualTo("/rest-api");
 
         this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class);
@@ -63,7 +67,7 @@ class ApiTest {
     }
 
     @Test
-    void getHelloCallsXroad() {
+    void getHelloCallsXroadRest() {
         assertThat(contextPath).isEqualTo("/rest-api");
 
         this.restTemplate.getForObject(baseUrl() + "/hello", RandomNumberDto.class);
@@ -79,5 +83,43 @@ class ApiTest {
         assertThat(principal.getUsername()).isEqualTo("org1.com");
         assertThat(principal.getPasswordFromSecretsManager()).isEqualTo("password");
         assertThat(principal.getToken(xroadConnectionServiceRest.TOKEN_ID)).isNull();
+    }
+
+    @Test
+    void getRandomWithProtocolSoapCallsXroadSoap() {
+        assertThat(contextPath).isEqualTo("/rest-api");
+
+        this.restTemplate.getForObject(baseUrl() + "/random?protocol=soap", RandomNumberDto.class);
+
+        Mockito.verify(
+                xroadConnectionServiceSoap,
+                Mockito.times(1)
+        ).makeGetRandomRequest(principalCaptor.capture());
+
+        ConsumerServiceUser principal = principalCaptor.getValue();
+        assertThat(principal.getXroadMemberClass()).isEqualTo("GOV");
+        assertThat(principal.getXroadMemberCode()).isEqualTo("11111-1");
+        assertThat(principal.getUsername()).isEqualTo("org1.com");
+        assertThat(principal.getPasswordFromSecretsManager()).isEqualTo("password");
+        assertThat(principal.getToken(xroadConnectionServiceSoap.TOKEN_ID)).isNull();
+    }
+
+    @Test
+    void getHelloWithProtocolSoapCallsXroadSoap() {
+        assertThat(contextPath).isEqualTo("/rest-api");
+
+        this.restTemplate.getForObject(baseUrl() + "/hello?protocol=soap&name=foo", RandomNumberDto.class);
+
+        Mockito.verify(
+                xroadConnectionServiceSoap,
+                Mockito.times(1)
+        ).makeHelloServiceRequest(principalCaptor.capture(), Mockito.any());
+
+        ConsumerServiceUser principal = principalCaptor.getValue();
+        assertThat(principal.getXroadMemberClass()).isEqualTo("GOV");
+        assertThat(principal.getXroadMemberCode()).isEqualTo("11111-1");
+        assertThat(principal.getUsername()).isEqualTo("org1.com");
+        assertThat(principal.getPasswordFromSecretsManager()).isEqualTo("password");
+        assertThat(principal.getToken(xroadConnectionServiceSoap.TOKEN_ID)).isNull();
     }
 }

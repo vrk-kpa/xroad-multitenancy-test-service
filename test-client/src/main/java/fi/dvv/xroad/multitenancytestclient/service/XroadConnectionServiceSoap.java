@@ -31,7 +31,11 @@ public class XroadConnectionServiceSoap {
     @Value("${security-server.url}")
     private String securityServerUrl;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public XroadConnectionServiceSoap(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public MessageDto makeHelloServiceRequest(ConsumerServiceUser principal, String name) {
         System.out.println("Sending helloService request to security server: " + securityServerUrl);

@@ -4,9 +4,7 @@ import fi.dvv.xroad.multitenancytestclient.auth.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
 import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceRest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,30 +18,41 @@ import static org.mockserver.matchers.Times.exactly;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestXroadConnectionServiceRest {
 
     @Autowired
     XroadConnectionServiceRest service;
 
-    private ClientAndServer mockServer;
+    static private ClientAndServer mockServer;
 
     @Value("${security-server.service-id}")
     private String serviceId;
 
     private XroadMockServerRestTransactions transactions;
 
-    @BeforeEach
-    public void startServer() {
-        transactions = new XroadMockServerRestTransactions(serviceId);
+    @BeforeAll
+    public static void startServer() {
         mockServer = startClientAndServer(8181);
     }
 
+    @BeforeEach
+    public void resetServer() {
+        transactions = new XroadMockServerRestTransactions(serviceId);
+    }
+
     @AfterEach
-    public void stopServer() {
+    public void resetMocks() {
+        mockServer.reset();
+    }
+
+    @AfterAll
+    public static void stopServer() {
         mockServer.stop();
     }
 
     @Test
+    @Order(0)
     public void callingGetRandomWithTokenReturnsRandomNumber() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
         principal.setToken(service.TOKEN_ID, "Bearer foo");
@@ -59,6 +68,7 @@ public class TestXroadConnectionServiceRest {
     }
 
     @Test
+    @Order(1)
     public void callingGetRandomWithoutTokenTriggersLogin() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
 
@@ -77,6 +87,7 @@ public class TestXroadConnectionServiceRest {
     }
 
     @Test
+    @Order(2)
     public void callingGetRandomWithInvalidTokenTriggersLogin() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
         principal.setToken(service.TOKEN_ID, "Bearer bar");
@@ -102,6 +113,7 @@ public class TestXroadConnectionServiceRest {
 
 
     @Test
+    @Order(3)
     public void callingGetHelloWithTokenReturnsGreeting() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
         principal.setToken(service.TOKEN_ID, "Bearer foo");
@@ -116,6 +128,7 @@ public class TestXroadConnectionServiceRest {
     }
 
     @Test
+    @Order(4)
     public void callingGetHelloWithoutTokenTriggersLogin() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
 
@@ -134,6 +147,7 @@ public class TestXroadConnectionServiceRest {
     }
 
     @Test
+    @Order(5)
     public void callingGetHelloWithInvalidTokenTriggersLogin() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
         principal.setToken(service.TOKEN_ID, "Bearer bar");

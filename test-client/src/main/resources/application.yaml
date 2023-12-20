@@ -19,7 +19,11 @@ server:
     trust-store-password: "changeit"
 
 security-server:
-  url: http://ss:8080
+  # This hostname must match the CN of the security server cert.
+  # Also check that it is set as an alias in docker-compose.yaml
+  # This way we can use the default certificate of the stand-alone security server
+  # and avoid creating yet another cert.
+  url: https://def89e4652f4:8443
   client-id: CS/ORG/1111/TestClient
   service-id: CS/ORG/1111/TestService/rest-test
 

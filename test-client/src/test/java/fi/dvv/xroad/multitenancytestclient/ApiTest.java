@@ -33,10 +33,9 @@ class ApiTest {
         return "https://localhost:" + port + contextPath;
     }
 
-    // This autowires to the RestTemplate created in TestRestTemplateClient.
-    // It is configured to use the external-consumer-keystore.p12
+    // This RestTemplate is configured to use the external-consumer-keystore.p12
     @Autowired
-    private RestTemplate restTemplate;
+    private RestTemplate unitTestRestTemplate;
 
     @Autowired
     private XroadConnectionServiceRest xroadConnectionServiceRest;
@@ -51,7 +50,7 @@ class ApiTest {
     void getRandomCallsXroadRest() {
         assertThat(contextPath).isEqualTo("/rest-api");
 
-        this.restTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class);
+        this.unitTestRestTemplate.getForObject(baseUrl() + "/random", RandomNumberDto.class);
 
         Mockito.verify(
                 xroadConnectionServiceRest,
@@ -70,7 +69,7 @@ class ApiTest {
     void getHelloCallsXroadRest() {
         assertThat(contextPath).isEqualTo("/rest-api");
 
-        this.restTemplate.getForObject(baseUrl() + "/hello", RandomNumberDto.class);
+        this.unitTestRestTemplate.getForObject(baseUrl() + "/hello", RandomNumberDto.class);
 
         Mockito.verify(
                 xroadConnectionServiceRest,
@@ -89,7 +88,7 @@ class ApiTest {
     void getRandomWithProtocolSoapCallsXroadSoap() {
         assertThat(contextPath).isEqualTo("/rest-api");
 
-        this.restTemplate.getForObject(baseUrl() + "/random?protocol=soap", RandomNumberDto.class);
+        this.unitTestRestTemplate.getForObject(baseUrl() + "/random?protocol=soap", RandomNumberDto.class);
 
         Mockito.verify(
                 xroadConnectionServiceSoap,
@@ -108,7 +107,7 @@ class ApiTest {
     void getHelloWithProtocolSoapCallsXroadSoap() {
         assertThat(contextPath).isEqualTo("/rest-api");
 
-        this.restTemplate.getForObject(baseUrl() + "/hello?protocol=soap&name=foo", RandomNumberDto.class);
+        this.unitTestRestTemplate.getForObject(baseUrl() + "/hello?protocol=soap&name=foo", RandomNumberDto.class);
 
         Mockito.verify(
                 xroadConnectionServiceSoap,

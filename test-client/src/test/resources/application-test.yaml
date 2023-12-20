@@ -12,3 +12,12 @@ server:
 
 security-server:
     url: http://localhost:8181
+
+---
+spring:
+    config:
+        activate:
+            on-profile: mockserver2
+
+security-server:
+    url: http://localhost:8282

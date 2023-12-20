@@ -1,10 +1,9 @@
 services:
   ss:
     image: niis/xroad-security-server-standalone:latest
-    hostname: ss
+    hostname: "def89e4652f4"
     ports:
       - 4000:4000
-      - 8080:8080
 
   test-service:
     build:
@@ -33,5 +32,6 @@ services:
     volumes:
       - ${PWD}/test-client/keys/keystore.p12:/app/test-client/keys/keystore.p12:ro
       - ${PWD}/test-client/keys/truststore.p12:/app/test-client/keys/truststore.p12:ro
+      - ${PWD}/test-client/keys/truststore.p12:/app/keys/truststore.p12:ro
     ports:
       - 8443:8443

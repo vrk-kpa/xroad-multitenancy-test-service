@@ -27,7 +27,11 @@ public class XroadConnectionServiceRest {
     @Value("${security-server.url}")
     private String securityServerUrl;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public XroadConnectionServiceRest(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public MessageDto getHello(ConsumerServiceUser principal, String name) {
         String uri = securityServerUrl + "/r1/" + serviceId + "/private/hello?name=" + name;
@@ -77,7 +81,6 @@ public class XroadConnectionServiceRest {
 
         System.out.println("Sending headers: " + headers);
 
-        RestTemplate restTemplate = new RestTemplate();
         String jwt = restTemplate.exchange(uri, HttpMethod.GET, entity, MessageDto.class).getHeaders().get("Authorization").get(0);
         System.out.println("Got JWT: " + jwt);
         principal.setToken(TOKEN_ID, jwt);

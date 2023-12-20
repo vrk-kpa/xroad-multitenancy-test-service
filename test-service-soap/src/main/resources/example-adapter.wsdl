@@ -248,7 +248,7 @@
     </wsdl:binding>
     <wsdl:service name="testService">
         <wsdl:port binding="tns:testServiceBinding" name="testServicePort">
-            <soap:address location="http://localhost:8080/multitenancy-soap/Endpoint"/>
+            <soap:address location="https://test-service-soap:8443/example-adapter/Endpoint"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

@@ -88,6 +88,37 @@ The certificate file to add is `test-service-soap/keys/test-service-soap-cert.pe
 For more info about and examples of standalone security server configuration, refer to 
 [the tutorial](https://github.com/digitaliceland/Straumurinn/blob/master/DOC/Manuals/standalone_security_server_tutorial.md).
 
+### Setup TLS from test-client to security server
+Download the security server's certificate from the security server UI. Navigate to 
+`Keys and certificates -> Security server TLS key` and click the `Export cert` button.
+Open the certificate details by clicking the hash value in security server UI and check the CN name.
+Check that security server hostname in test-client's `application.yaml` configuration and the alias name 
+set for the security server in `docker-compose yaml` both match to this CN name.
+
+Unpack the downloaded `certs.tar.gz` in some temporary folder and add the `cert.pem` to test-client trust store:
+```shell
+```shell
+tar -xzf certs.tar.gz
+cd certs
+
+keytool \
+  -importcert \
+  -alias ss \
+  -file cert.pem \
+  -keystore {project-root}/test-client/keys/truststore.p12 \
+  -storetype pkcs12 \
+  -storepass changeit \
+  -noprompt
+```
+
+Now you can set the security server to accept only requests over HTTPS. 
+Navigate to `Internal servers` tab and set connection type as `HTTPS NO AUTH`.
+
+The other option named only `HTTPS` requires that also the test-client's certificate is added 
+to the security servers trust list (mTLS). This could be done for added security in a zero-trust network and is left as
+an exercise for the reader.
+
+
 ### Try it out
 The folder ``external-consumer`` contains a script to make calls to the test-service as a mock organisation.
 There are three mock organisations, `org1`, `org2` and `org3`, and the `create-certs.sh` script 

@@ -4,14 +4,13 @@ import fi.dvv.xroad.multitenancytestclient.auth.ConsumerServiceUser;
 import fi.dvv.xroad.multitenancytestclient.model.MessageDto;
 import fi.dvv.xroad.multitenancytestclient.model.RandomNumberDto;
 import fi.dvv.xroad.multitenancytestclient.service.XroadConnectionServiceSoap;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,13 +18,14 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.matchers.Times.exactly;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "mockserver2"})
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestXroadConnectionServiceSoap {
 
     @Autowired
     XroadConnectionServiceSoap service;
 
-    private ClientAndServer mockServer;
+    static private ClientAndServer mockServer;
 
     @Value("${security-server.service-id}")
     private String serviceId;
@@ -35,18 +35,28 @@ public class TestXroadConnectionServiceSoap {
 
     private XroadMockServerSoapTransactions transactions;
 
+    @BeforeAll
+    public static void startServer() {
+        mockServer = startClientAndServer(8282);
+    }
+
     @BeforeEach
-    public void startServer() {
+    public void resetServer() {
         transactions = new XroadMockServerSoapTransactions(clientId, serviceId);
-        mockServer = startClientAndServer(8181);
     }
 
     @AfterEach
-    public void stopServer() {
+    public void resetMocks() {
+        mockServer.reset();
+    }
+
+    @AfterAll
+    public static void stopServer() {
         mockServer.stop();
     }
 
     @Test
+    @Order(1)
     public void callingGetRandomWithTokenReturnsRandomNumber() {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
         principal.setToken(service.TOKEN_ID, "goodtoken");
@@ -62,6 +72,7 @@ public class TestXroadConnectionServiceSoap {
     }
 
     @Test
+    @Order(2)
     public void callingGetRandomWithoutTokenTriggersLogin() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
 
@@ -80,6 +91,7 @@ public class TestXroadConnectionServiceSoap {
     }
 
     @Test
+    @Order(3)
     public void callingGetRandomWithInvalidTokenTriggersLogin() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
         principal.setToken(service.TOKEN_ID, "badtoken");
@@ -105,6 +117,7 @@ public class TestXroadConnectionServiceSoap {
 
 
     @Test
+    @Order(4)
     public void callingGetHelloWithTokenReturnsGreeting() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
         principal.setToken(service.TOKEN_ID, "goodtoken");
@@ -119,6 +132,7 @@ public class TestXroadConnectionServiceSoap {
     }
 
     @Test
+    @Order(5)
     public void callingGetHelloWithoutTokenTriggersLogin() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
 
@@ -137,6 +151,7 @@ public class TestXroadConnectionServiceSoap {
     }
 
     @Test
+    @Order(6)
     public void callingGetHelloWithInvalidTokenTriggersLogin() throws Exception {
         ConsumerServiceUser principal = new ConsumerServiceUser("org1.com", "password", "GOV", "11111-1");
         principal.setToken(service.TOKEN_ID, "badtoken");

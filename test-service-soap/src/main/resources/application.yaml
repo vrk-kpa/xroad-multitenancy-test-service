@@ -15,7 +15,7 @@ server:
   port: 8443
   ssl:
     key-store-type: "PKCS12"
-    key-store: "file:test-service-soap/keys/keystore.p12"
+    key-store: "file:keys/keystore.p12"
     key-store-password: "changeit"
     key-alias: "xroad-multitenancy-test-service-soap-tls-certificate"
     key-password: "changeit"

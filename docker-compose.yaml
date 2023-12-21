@@ -11,7 +11,6 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - ${PWD}/test-service/keys/keystore.p12:/app/keys/keystore.p12:ro
-      - ${PWD}/test-service/keys/keystore.p12:/app/test-service/keys/keystore.p12:ro
     environment:
         - SPRING_PROFILES_ACTIVE=default,use_tls
 

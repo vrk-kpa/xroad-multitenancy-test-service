@@ -3,17 +3,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.niis</groupId>
-    <artifactId>example-adapter</artifactId>
-    <version>0.0.6-SNAPSHOT</version>
-    <name>Example Adapter for X-Road version 6</name>
-    <inceptionYear>2018</inceptionYear>
+    <artifactId>xroad-multitenancy-soap-test-service</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Suomi.fi Palveluvayla Mutlitenancy SOAP Test Service</name>
+    <inceptionYear>2023</inceptionYear>
     <description>
-        This project provides an example implementation of a web service
-        that's compatible with X-Road version 6. The implementation is based
-        on XRd4J library. The service contains a single servlet that implements
-        two services
+        Suomi.fi Palveluvayla Mutlitenancy SOAP Test Service
     </description>
-    <url>https://github.com/nordic-institute/xrd4j/tree/master/example-adapter</url>
+    <url>https://github.com/vrk-kpa/xroad-multitenancy-test-service</url>
     <packaging>war</packaging>
     <parent>
         <groupId>org.springframework.boot</groupId>

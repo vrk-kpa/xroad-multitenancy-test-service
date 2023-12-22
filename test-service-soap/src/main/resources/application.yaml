@@ -1,4 +1,4 @@
-server.servlet.context-path: /example-adapter
+server.servlet.context-path: /multitenancy-soap-test-service
 server.port: 8080
 spring.mvc.view.prefix: /WEB-INF/jsp/
 spring.mvc.view.suffix: .jsp

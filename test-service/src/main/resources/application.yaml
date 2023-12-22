@@ -1,4 +1,4 @@
-server.servlet.contextPath: /rest-api
+server.servlet.contextPath: /multitenancy-rest-test-service/api
 springdoc.api-docs.path: api-docs
 spring.web.resources.add-mappings: false
 

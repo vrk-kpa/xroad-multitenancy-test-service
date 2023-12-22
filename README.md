@@ -77,7 +77,7 @@ was created by the `create-certs.sh` script above.
 
 ### Register test-service-soap to the security server
 Add the test-service-soap to the service list of `CS:ORG:1111:TestService` as a SOAP service by providing the
-service's WSDL URL: `https://test-service-soap:8443/example-adapter/Endpoint?wsdl`.
+service's WSDL URL: `https://test-service-soap:8443/multitenancy-soap-test-service/Endpoint?wsdl`.
 
 This should add new services with service code `authenticate`, `getRandom` and `helloService` to the service list.
 Enable all the new services and add permissions for `CS:ORG:1111:TestClient` to call them.

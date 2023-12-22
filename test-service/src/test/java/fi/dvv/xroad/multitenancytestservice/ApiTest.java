@@ -66,8 +66,8 @@ class ApiTest {
 
     @Test
     void nonExistentEndpointReturnsError() throws Exception {
-        ErrorDto error = this.restTemplate.getForObject(baseUrl() + "/i-dont-exist", ErrorDto.class);
-        assertThat(error.errorMessage()).isEqualTo("No endpoint GET /rest-api/i-dont-exist.");
+        ErrorDto error = this.restTemplate.getForObject(baseUrl() + "/nothere", ErrorDto.class);
+        assertThat(error.errorMessage()).isEqualTo("No endpoint GET /multitenancy-rest-test-service/api/nothere.");
         assertThat(error.httpStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 

@@ -24,6 +24,7 @@ package fi.dvv.xroad.multitenancytestservicesoap;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -47,8 +48,11 @@ class SoapApiTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private String baseUrl() {
-        return "http://localhost:" + port;
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
+    private String endpointUrl() {
+        return "http://localhost:" + port + contextPath + "/Endpoint";
     };
     
     @Test
@@ -59,7 +63,7 @@ class SoapApiTest {
         header.setContentType(MediaType.TEXT_XML);
 
         HttpEntity authenticateEntity = new HttpEntity<>(authenticateRequest, header);
-        ResponseEntity<String> authenticateResponse = restTemplate.exchange(baseUrl() + "/example-adapter/Endpoint", HttpMethod.POST, authenticateEntity, String.class);
+        ResponseEntity<String> authenticateResponse = restTemplate.exchange(endpointUrl(), HttpMethod.POST, authenticateEntity, String.class);
         String authenticateBody = authenticateResponse.getBody();
         String jwt = extractJwtFromXmlResponse(authenticateBody);
         assertThat(jwt).isNotNull().isNotEmpty();
@@ -68,7 +72,7 @@ class SoapApiTest {
         helloRequest = helloRequest.replace("dummytoken", jwt);
 
         HttpEntity helloEntity = new HttpEntity<>(helloRequest, header);
-        ResponseEntity<String> helloResponse = restTemplate.exchange(baseUrl() + "/example-adapter/Endpoint", HttpMethod.POST, helloEntity, String.class);
+        ResponseEntity<String> helloResponse = restTemplate.exchange(endpointUrl(), HttpMethod.POST, helloEntity, String.class);
         String helloBody = helloResponse.getBody();
         assertThat(helloBody).contains("Erkki Esimerkki");
 
@@ -89,7 +93,7 @@ class SoapApiTest {
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.TEXT_XML);
         HttpEntity entity = new HttpEntity<>(request, header);
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl() + "/example-adapter/Endpoint", HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(endpointUrl(), HttpMethod.POST, entity, String.class);
         String responseString = response.getBody();
 
         token = extractJwtFromXmlResponse(responseString);
@@ -103,7 +107,7 @@ class SoapApiTest {
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.TEXT_XML);
         HttpEntity entity = new HttpEntity<>(request, header);
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl() + "/example-adapter/Endpoint", HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(endpointUrl(), HttpMethod.POST, entity, String.class);
         String responseString = response.getBody();
 
         assertThat(responseString).contains("invalid token");
@@ -117,7 +121,7 @@ class SoapApiTest {
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.TEXT_XML);
         HttpEntity entity = new HttpEntity<>(request, header);
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl() + "/example-adapter/Endpoint", HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(endpointUrl(), HttpMethod.POST, entity, String.class);
         String responseString = response.getBody();
 
         assertThat(responseString).contains("<extsec:securityToken");

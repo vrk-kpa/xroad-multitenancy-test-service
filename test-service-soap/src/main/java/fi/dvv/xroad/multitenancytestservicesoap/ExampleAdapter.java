@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2018 Nordic Institute for Interoperability Solutions (NIIS)
+ * Copyright © 2023 Nordic Institute for Interoperability Solutions (NIIS)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,11 +48,8 @@ import org.springframework.stereotype.Component;
 /**
  * This class implements two simple X-Road 6 and X-Road 7 compatible services:
  * "getRandom" and "helloService". Service descriptions
- * are defined in "example-adapter.wsdl" file that's located in resources/ folder.
+ * are defined in "test-service-soap.wsdl" file that's located in resources/ folder.
  * The name of the WSDL file and the namespace is configured in resources/xrd-servlet.properties file.
- *
- * @author Petteri Kivimäki
- * @author Raido Kaju
  */
 @Component
 public class ExampleAdapter extends AbstractAdapterServlet {

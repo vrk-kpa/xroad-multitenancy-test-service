@@ -32,11 +32,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        String jwt = authHeader.split(" ")[1];
 
-        String jwt = request.getHeader("Authorization").split(" ")[1];
+        String representedParty = request.getHeader("X-Road-Represented-Party");
+        if(representedParty == null || representedParty.isEmpty()){
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         try {
-            if (!jwt.isEmpty() && jwtService.validateJwt(jwt)){
+            if (!jwt.isEmpty() && jwtService.validateJwt(jwt, representedParty)){
                 Authentication authentication =
                         new UsernamePasswordAuthenticationToken(jwtService.getSubject(jwt),"",new ArrayList<>());
                 SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -20,7 +20,6 @@ import java.time.Instant;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mockStatic;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MultitenancyApiTest {
@@ -72,6 +71,20 @@ class MultitenancyApiTest {
         String randomUrl = "http://localhost:" + port + contextPath + "/private/random";
         HttpHeaders randomHeaders = new HttpHeaders();
         randomHeaders.set("Authorization", "Bearer " + jwt);
+        randomHeaders.set("X-Road-Represented-Party", "FOO/12345-6");
+        HttpEntity randomEntity = new HttpEntity(randomHeaders);
+        ErrorDto error = restTemplate.exchange(randomUrl, HttpMethod.GET, randomEntity, ErrorDto.class).getBody();
+        assertThat(error.httpStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    void getRandomWithInvalidJwtSubjectReturnsUnauthorized() throws Exception {
+        String jwt = jwtService.generateJwt("FOO/12345-6", Date.from(Instant.now().plusSeconds(60*60*2 /* == 2 hours */)));
+
+        String randomUrl = "http://localhost:" + port + contextPath + "/private/random";
+        HttpHeaders randomHeaders = new HttpHeaders();
+        randomHeaders.set("Authorization", "Bearer " + jwt);
+        randomHeaders.set("X-Road-Represented-Party", "BAR/456789-6");
         HttpEntity randomEntity = new HttpEntity(randomHeaders);
         ErrorDto error = restTemplate.exchange(randomUrl, HttpMethod.GET, randomEntity, ErrorDto.class).getBody();
         assertThat(error.httpStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
@@ -93,7 +106,7 @@ class MultitenancyApiTest {
         assertThat(authHeader).contains("Bearer ");
 
         String jwt = authHeader.split(" ")[1];
-        assertThat(jwtService.validateJwt(jwt)).isTrue();
+        assertThat(jwtService.validateJwt(jwt, "FOO/12345-6")).isTrue();
     }
 
 
@@ -104,6 +117,7 @@ class MultitenancyApiTest {
         String randomUrl = "http://localhost:" + port + contextPath + "/private/random";
         HttpHeaders randomHeaders = new HttpHeaders();
         randomHeaders.set("Authorization", "Bearer " + jwt);
+        randomHeaders.set("X-Road-Represented-Party", "FOO/12345-6");
         HttpEntity randomEntity = new HttpEntity(randomHeaders);
         RandomNumberDto randomNumberDto = restTemplate.exchange(randomUrl, HttpMethod.GET, randomEntity, RandomNumberDto.class).getBody();
         assertThat(randomNumberDto.data()).isGreaterThanOrEqualTo(1).isLessThanOrEqualTo(100);
@@ -116,6 +130,7 @@ class MultitenancyApiTest {
         String helloUrl = "http://localhost:" + port + contextPath + "/private/hello";
         HttpHeaders helloHeaders = new HttpHeaders();
         helloHeaders.set("Authorization", "Bearer " + jwt);
+        helloHeaders.set("X-Road-Represented-Party", "FOO/12345-6");
         HttpEntity helloEntity = new HttpEntity(helloHeaders);
         MessageDto helloResponse = restTemplate.exchange(helloUrl, HttpMethod.GET, helloEntity, MessageDto.class).getBody();
         assertThat(helloResponse.message()).contains("FOO/12345-6");

@@ -42,7 +42,7 @@ class JwtServiceTest {
     @Test
     void generateJwtReturnsJwtWithCorrectSubject() throws Exception {
         String jwt = jwtService.generateJwt("FOO:12345-6", Date.from(Instant.now().plusSeconds(60*60*2)));
-        assertThat(jwtService.validateJwt(jwt)).isTrue();
+        assertThat(jwtService.validateJwt(jwt, "FOO:12345-6")).isTrue();
 
         String[] parts = jwt.split("\\.", 0);
         String decodedPayload = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
@@ -52,7 +52,13 @@ class JwtServiceTest {
     @Test
     void expiredJwtIsNotValidated() throws Exception {
         String jwt = jwtService.generateJwt("FOO:12345-6", Date.from(Instant.now().minusSeconds(60*60*2)));
-        assertThat(jwtService.validateJwt(jwt)).isFalse();
+        assertThat(jwtService.validateJwt(jwt, "FOO:12345-6")).isFalse();
+    }
+
+    @Test
+    void invalidSubInJwtIsNotValidated() throws Exception {
+        String jwt = jwtService.generateJwt("FOO:12345-6", Date.from(Instant.now().minusSeconds(60*60*2)));
+        assertThat(jwtService.validateJwt(jwt, "BAR:45678-6")).isFalse();
     }
 
     @Test

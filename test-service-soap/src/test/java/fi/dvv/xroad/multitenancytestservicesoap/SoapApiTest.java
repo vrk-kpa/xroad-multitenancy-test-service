@@ -114,6 +114,29 @@ class SoapApiTest {
     }
 
     @Test
+    void helloServiceReturnsUnauthorizedWhenRepresentedPartyDoesNotMatchJwtSub() throws IOException {
+        String authenticateRequest = readRequestFile("authenticate-request.xml");
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.TEXT_XML);
+
+        HttpEntity authenticateEntity = new HttpEntity<>(authenticateRequest, header);
+        ResponseEntity<String> authenticateResponse = restTemplate.exchange(endpointUrl(), HttpMethod.POST, authenticateEntity, String.class);
+        String authenticateBody = authenticateResponse.getBody();
+        String jwt = extractJwtFromXmlResponse(authenticateBody);
+        assertThat(jwt).isNotNull().isNotEmpty();
+
+        String helloRequest = readRequestFile("hello-service-request.xml");
+        helloRequest = helloRequest.replace("dummytoken", jwt);
+        helloRequest = helloRequest.replace("MEMBER3", "WRONG_MEMBER");
+
+        HttpEntity helloEntity = new HttpEntity<>(helloRequest, header);
+        ResponseEntity<String> helloResponse = restTemplate.exchange(endpointUrl(), HttpMethod.POST, helloEntity, String.class);
+        String responseString = helloResponse.getBody();
+        assertThat(responseString).contains("invalid token");
+    }
+
+    @Test
     void authenticateRequestReturnsToken() throws IOException {
 
         String request = readRequestFile("authenticate-request.xml");

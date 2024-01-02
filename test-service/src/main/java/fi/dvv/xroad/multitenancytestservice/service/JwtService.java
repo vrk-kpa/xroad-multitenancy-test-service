@@ -54,7 +54,7 @@ public class JwtService {
         return jwt;
     }
 
-    public boolean validateJwt(String jwt) throws ParseException, JOSEException {
+    public boolean validateJwt(String jwt, String expectedSub) throws ParseException, JOSEException {
         try {
             SignedJWT parsedJwt = SignedJWT.parse(jwt);
             boolean signatureOk = parsedJwt.verify(new RSASSAVerifier(key.toRSAPublicKey()));
@@ -63,7 +63,7 @@ public class JwtService {
             boolean expirationOk = claims.getExpirationTime().after(Date.from(Instant.now()));
             boolean issuerOk = claims.getIssuer().equals("xroad-multi-tenancy-test-service");
             boolean audienceOk = claims.getAudience().contains("xroad");
-            boolean subjectOk = !claims.getSubject().isEmpty();
+            boolean subjectOk = claims.getSubject().equals(expectedSub);
             return signatureOk && expirationOk && issuerOk && audienceOk && subjectOk;
         } catch (Exception e) {
             return false;

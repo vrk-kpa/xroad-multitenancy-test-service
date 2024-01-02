@@ -35,6 +35,7 @@ import org.niis.xrd4j.server.deserializer.AbstractCustomRequestDeserializer;
 import org.niis.xrd4j.server.serializer.AbstractServiceResponseSerializer;
 import org.niis.xrd4j.server.serializer.ServiceResponseSerializer;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
@@ -109,7 +110,7 @@ public class ExampleAdapter extends AbstractAdapterServlet {
             }
         }
 
-        if (!verifyToken(request)){
+        if (!verifyToken(request, partyClass, partyCode)){
             return processUnauthorizedRequest(request);
         }
 
@@ -130,9 +131,9 @@ public class ExampleAdapter extends AbstractAdapterServlet {
         return response;
     }
 
-    private boolean verifyToken(ServiceRequest request) {
+    private boolean verifyToken(ServiceRequest request, String partyClass, String partyCode) {
         String token = request.getSecurityToken();
-        return jwtService.validateJwt(token);
+        return jwtService.validateJwt(token, partyClass + ":" + partyCode);
     }
 
     private boolean verifyUserAuth(UserAuth userAuth, String partyClass, String partyCode) {

@@ -16,7 +16,7 @@ public class XroadMockServerRestTransactions {
     }
 
     public HttpRequest getLoginRequest() {
-        return request().withMethod("GET").withPath("/r1/" + serviceId + "/login")
+        return request().withMethod("GET").withPath("/r1/" + serviceId + "/authenticate")
                 .withHeader("X-Road-Client", "CS/ORG/1111/TestClient")
                 .withHeader("X-Road-Represented-Party", "GOV/11111-1")
                 .withHeader("Member-Username", "GOV/11111-1")

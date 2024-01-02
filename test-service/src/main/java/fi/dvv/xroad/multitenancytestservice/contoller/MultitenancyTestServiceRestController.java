@@ -28,13 +28,13 @@ public class MultitenancyTestServiceRestController {
         this.jwtService = jwtService;
     }
 
-    @GetMapping("/login")
+    @GetMapping("/authenticate")
     public ResponseEntity<MessageDto> login(
             @RequestHeader("X-Road-Represented-Party") String representedParty,
             @RequestHeader("Member-Username") String username,
             @RequestHeader("Member-Password") String password
     ) throws UnauthorizedException, ValidationException, JOSEException {
-        System.out.println("called /login");
+        System.out.println("called /authenticate");
 
         if (username == null || username.isEmpty()) {
             throw new ValidationException("Username is missing");

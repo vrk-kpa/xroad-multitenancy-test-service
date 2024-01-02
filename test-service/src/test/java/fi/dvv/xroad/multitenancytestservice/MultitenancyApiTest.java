@@ -79,7 +79,7 @@ class MultitenancyApiTest {
 
     @Test
     void getLoginReturnsJwt() throws Exception {
-        String loginUrl = baseUrl() + "/login";
+        String loginUrl = baseUrl() + "/authenticate";
 
         HttpHeaders loginHeaders = new HttpHeaders();
         loginHeaders.set("X-Road-Represented-Party", "FOO/12345-6");

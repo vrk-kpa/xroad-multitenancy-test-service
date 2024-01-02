@@ -67,7 +67,7 @@ public class XroadConnectionServiceRest {
     }
 
     private void loginPrincipal(ConsumerServiceUser principal) {
-        String uri = securityServerUrl + "/r1/" + serviceId + "/login";
+        String uri = securityServerUrl + "/r1/" + serviceId + "/authenticate";
         System.out.println("Calling security server: " + uri);
 
         HttpHeaders headers = new HttpHeaders();

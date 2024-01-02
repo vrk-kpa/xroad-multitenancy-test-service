@@ -8,12 +8,12 @@ features documented in [Suomi.fi Palveluhallinta](https://palveluhallinta.suomi.
 
 This repository contains three services that demonstrate how multiple organisations 
 can share a single X-Road subsystem and security server:
- * test-client: a client software that relays messages from external consumer organisations to X-Road services
- * test-service: a REST service that can be called by X-Road clients
- * test-service-soap: a SOAP service that can be called by X-Road clients
+ * [test-client](test-client/README.md): the multi-tenancy operator's information system that relays messages from external consumer organisations to X-Road services
+ * [test-service](test-service/README.md): a REST service that can serve multi-tenant clients over X-Road
+ * [test-service-soap](test-service-soap/README.md): a SOAP service that can serve multi-tenant clients over X-Road
 
 The services in this repository are not production ready, but are intended as a starting point for developing
-multi-tenant X-Road services. Especially user management features and secret handling are implemented only as mocks.
+multi-tenant X-Road services. Please refer to service specific README files for more information about each service.
 
 
 ## Dependencies
@@ -148,7 +148,3 @@ To test a failing certificate, run:
 ./test-request.sh org3 hello?name=John
 ```
 
-## test-client unit test keystores
-
-The keystores used by test-client unit tests are included in the git repo. 
-You can refer to ``test-client/src/test/resources/crete-keystores.sh`` to see how they are created.

@@ -64,7 +64,7 @@ The username is `xrd` and the password is `secret`.
 Standalone security server comes predefined with an X-Road service and a client, 
 named `CS:ORG:1111:TestService` and `CS:ORG:1111:TestClient` respectively.
 Add the test-service to the service list of `CS:ORG:1111:TestService` as a REST service.
-by providing the service's OpenApi description URL: `https://test-service:8443/rest-api/api-docs`. 
+by providing the service's OpenApi description URL: `https://test-service:8443/multitenancy-rest-test-service/api/api-docs`. 
 Security server will then automatically add all the service endpoints when creating the X-Road service. 
 Set the service-code to `rest-test` and remember to enable the service.
 
@@ -135,16 +135,16 @@ The `test-request.sh` script uses curl to make calls to the test-client using th
 To request a hello-greeting from test-service as `org1`, run:
 ```shell
 cd external-consumer
-./test-request.sh org1 hello?name=John
+./test-request.sh org1 "hello?name=John"
 ```
 
 To request a hello-greeting from test-service-soap as `org1`, run:
 ```shell
-./test-request.sh org2 hello?name=John&protocol=soap
+./test-request.sh org2 "hello?name=John&protocol=soap"
 ```
 
 To test a failing certificate, run:
 ```shell
-./test-request.sh org3 hello?name=John
+./test-request.sh org3 "hello?name=John"
 ```
 

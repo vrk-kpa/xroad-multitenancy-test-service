@@ -43,8 +43,11 @@ This test-service implementation is not a production ready component.
 At least the topics below should be considered when implementing a production service with multi-tenancy support:
 
 ### Consumer organisation management
-As mentioned above, the test-service has only a mock user database, that authenticates any username using the mock password.
-In a production system a database solution is needed to register the trusted organisations to the service.
+As mentioned above, the test-service has only a mock user management implementation, 
+that authenticates any username using the mock password.
+
+A production grade consumer organisation management implementation must implement a user management solution with 
+a way to register new trusted organisations, generate credentials for them and store those credentials in a safe way in the service.
 
 ### Secrets management
 The test-service uses .p12 keystores and trust-stores to store the required TLS certificates and JWT signing keys. 

@@ -70,7 +70,7 @@ public class ExampleAdapter extends AbstractAdapterServlet {
 
     @Override
     public void init() {
-        logger.debug("Starting to initialize Enpoint.");
+        logger.debug("Starting to initialize Endpoint.");
         this.props = PropertiesUtil.getInstance().load("/xrd-servlet.properties");
         this.namespaceSerialize = this.props.getProperty("namespace.serialize");
         this.namespaceDeserialize = this.props.getProperty("namespace.deserialize");

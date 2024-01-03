@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.Date;
 
@@ -127,13 +128,14 @@ class MultitenancyApiTest {
     void getHelloWithJwtReturnsGreetingWithSubject() throws Exception {
         String jwt = jwtService.generateJwt("FOO/12345-6", Date.from(Instant.now().plusSeconds(60*60*2 /* == 2 hours */)));
 
-        String helloUrl = "http://localhost:" + port + contextPath + "/private/hello";
+        URI helloUrl = new URI("http://localhost:" + port + contextPath + "/private/hello?name=Erkki%20Esimerkki");
         HttpHeaders helloHeaders = new HttpHeaders();
         helloHeaders.set("Authorization", "Bearer " + jwt);
         helloHeaders.set("X-Road-Represented-Party", "FOO/12345-6");
         HttpEntity helloEntity = new HttpEntity(helloHeaders);
         MessageDto helloResponse = restTemplate.exchange(helloUrl, HttpMethod.GET, helloEntity, MessageDto.class).getBody();
         assertThat(helloResponse.message()).contains("FOO/12345-6");
+        assertThat(helloResponse.message()).contains("Erkki Esimerkki");
     }
 
     @Test

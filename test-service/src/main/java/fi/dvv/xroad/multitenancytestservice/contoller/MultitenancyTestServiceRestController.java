@@ -6,12 +6,14 @@ import fi.dvv.xroad.multitenancytestservice.error.ValidationException;
 import fi.dvv.xroad.multitenancytestservice.model.MessageDto;
 import fi.dvv.xroad.multitenancytestservice.model.RandomNumberDto;
 import fi.dvv.xroad.multitenancytestservice.service.JwtService;
+import org.owasp.esapi.ESAPI;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
@@ -64,14 +66,37 @@ public class MultitenancyTestServiceRestController {
     }
 
     @GetMapping("private/random")
-    public RandomNumberDto getRandomInt() {
-        System.out.println("called /private/random");
+    public RandomNumberDto getRandomInt(
+            @RequestHeader("X-Road-Represented-Party") String representedParty,
+            @AuthenticationPrincipal String principal
+    ) {
+        System.out.println("called /private/random as principal " + principal + " representing " + representedParty);
         return new RandomNumberDto(randomGenerator.nextInt(maxRandom));
     }
 
     @GetMapping("private/hello")
-    public MessageDto getGreeting(@AuthenticationPrincipal String principal) {
-        System.out.println("called /private/hello");
-        return new MessageDto("Hello " + principal + "! Greetings from adapter server!");
+    public MessageDto getGreeting(
+            @RequestParam(value = "name", defaultValue = "") String name,
+            @RequestHeader("X-Road-Represented-Party") String representedParty,
+            @AuthenticationPrincipal String principal
+    ) {
+        System.out.println("called /private/hello as principal " + principal + " representing " + representedParty);
+
+        String nameOut = "";
+
+        if(!stringIsEmpty(name)) {
+            validateName(name);
+            nameOut = " " + ESAPI.encoder().encodeForJSON(name);
+        }
+
+        return new MessageDto("Hello " + nameOut + ", representing " + representedParty + "! Greetings from adapter server!");
+    }
+
+    private Boolean stringIsEmpty(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+    private void validateName(String name) {
+        if (name.length() > 256)
+            throw new ValidationException("Name is too long. Max length is 256 characters.");
     }
 }

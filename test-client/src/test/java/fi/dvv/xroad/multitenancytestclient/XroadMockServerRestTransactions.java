@@ -16,7 +16,7 @@ public class XroadMockServerRestTransactions {
     }
 
     public HttpRequest getLoginRequest() {
-        return request().withMethod("GET").withPath("/r1/" + serviceId + "/authenticate")
+        return request().withMethod("POST").withPath("/r1/" + serviceId + "/authenticate")
                 .withHeader("X-Road-Client", "CS/ORG/1111/TestClient")
                 .withHeader("X-Road-Represented-Party", "GOV/11111-1")
                 .withHeader("Member-Username", "GOV/11111-1")
@@ -26,8 +26,8 @@ public class XroadMockServerRestTransactions {
     public HttpResponse getLoginResponse() {
         return response().withStatusCode(200)
                 .withHeader("Authorization", "Bearer foo")
-                .withHeader("content-type", "application/json")
-                .withBody("{\"message\": \"Login success\"}");
+                .withHeader("content-type", "application/json");
+                // .withBody("{\"message\": \"Login success\"}");
     }
 
     public HttpRequest getRandomRequest() {

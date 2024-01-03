@@ -101,7 +101,7 @@ class MultitenancyApiTest {
         loginHeaders.set("Member-Password", "password");
 
         HttpEntity loginEntity = new HttpEntity(loginHeaders);
-        HttpEntity loginResponse = restTemplate.exchange(loginUrl, HttpMethod.GET, loginEntity, String.class);
+        HttpEntity loginResponse = restTemplate.exchange(loginUrl, HttpMethod.POST, loginEntity, String.class);
 
         String authHeader = loginResponse.getHeaders().get("Authorization").get(0);
         assertThat(authHeader).contains("Bearer ");

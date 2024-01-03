@@ -81,7 +81,7 @@ public class XroadConnectionServiceRest {
 
         System.out.println("Sending headers: " + headers);
 
-        String jwt = restTemplate.exchange(uri, HttpMethod.GET, entity, MessageDto.class).getHeaders().get("Authorization").get(0);
+        String jwt = restTemplate.exchange(uri, HttpMethod.POST, entity, MessageDto.class).getHeaders().get("Authorization").get(0);
         System.out.println("Got JWT: " + jwt);
         principal.setToken(TOKEN_ID, jwt);
     }

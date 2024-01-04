@@ -143,8 +143,7 @@ To request a hello-greeting from test-service-soap as `org1`, run:
 ./test-request.sh org2 "hello?name=John&protocol=soap"
 ```
 
-To test a failing certificate, run:
+`org3` certificate is not trusted by test-client, so it can be used to test certificate validation error:
 ```shell
 ./test-request.sh org3 "hello?name=John"
 ```
-

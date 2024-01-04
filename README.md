@@ -1,16 +1,19 @@
-# xroad-multitenancey-test-service
-
-A test service to demonstrate X-Road multitenancy with REST services.
+# X-Road Multitenancy Reference Implementation
 
 ## Overview
-The services are intended to provide a reference implementation of the Suomi.fi Palveluväylä multi-tenancy 
+The services in this repository are intended to provide a reference implementation of the Suomi.fi Palveluväylä multi-tenancy 
 features documented in [Suomi.fi Palveluhallinta](https://palveluhallinta.suomi.fi/fi/tuki/artikkelit/63f8ab85e0763400245f2c8f).
 
-This repository contains three services that demonstrate how multiple organisations 
-can share a single X-Road subsystem and security server:
+The purpose of the multi-tenancy solution is to allow multiple independent consumer organisations to share a single X-Road
+subsystem and security server provided by a 3rd party multi-tenancy operator.
+
+This reference implementation consists of the followin modules:
  * [test-client](test-client/README.md): the multi-tenancy operator's information system that relays messages from external consumer organisations to X-Road services
  * [test-service](test-service/README.md): a REST service that can serve multi-tenant clients over X-Road
  * [test-service-soap](test-service-soap/README.md): a SOAP service that can serve multi-tenant clients over X-Road
+ * [external-consumer](external-consumer/README.md): scripts to mock consumer organisations that make calls to X-Road 
+   services through multi-tenancy operator's system.
+
 
 The services in this repository are not production ready, but are intended as a starting point for developing
 multi-tenant X-Road services. Please refer to service specific README files for more information about each service.
@@ -58,7 +61,7 @@ docker compose up -d
 It takes a while for the security server to start up. You can check the logs with `docker compose logs -f ss`.
 
 ### Register test-service to the security server
-Login to the security server UI by opening http://localhost:4000 in your browser. 
+Login to the security server UI by opening https://localhost:4000 in your browser. 
 The username is `xrd` and the password is `secret`.
 
 Standalone security server comes predefined with an X-Road service and a client, 
@@ -99,7 +102,6 @@ Unpack the downloaded `certs.tar.gz` in some temporary folder and add the `cert.
 ```shell
 ```shell
 tar -xzf certs.tar.gz
-cd certs
 
 keytool \
   -importcert \
@@ -117,6 +119,11 @@ Navigate to `Internal servers` tab and set connection type as `HTTPS NO AUTH`.
 The other option named only `HTTPS` requires that also the test-client's certificate is added 
 to the security servers trust list (mTLS). This could be done for added security in a zero-trust network and is left as
 an exercise for the reader.
+
+After adding the certificate to test-client's trust store, you need to restart the test-client to reload the trust-store file:
+```shell
+docker compose restart test-client
+```
 
 
 ### Try it out

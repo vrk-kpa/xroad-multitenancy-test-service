@@ -138,7 +138,7 @@ cd external-consumer
 ./test-request.sh org1 "hello?name=John"
 ```
 
-To request a hello-greeting from test-service-soap as `org1`, run:
+To request a hello-greeting from test-service-soap as `org2`, run:
 ```shell
 ./test-request.sh org2 "hello?name=John&protocol=soap"
 ```
